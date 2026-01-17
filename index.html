@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy  - Ultimative KI by Fabian</title>
+<title>Minecraft Plugin Academy - Ultimative KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -13,7 +13,7 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 
 <header class="bg-black/60 backdrop-blur sticky top-0 z-50">
   <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy</h1>
+    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy by Fabian</h1>
     <button onclick="openMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded">Coding KI</button>
   </div>
 </header>
@@ -43,9 +43,17 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 </div>
 
 <!-- Minecraft Coding KI -->
-<div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16">
+<div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16 overflow-auto">
   <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white absolute top-6 right-6">Schließen</button>
   <h2 class="text-3xl font-bold mb-4 text-mcgreen">Universelle Minecraft Coding KI</h2>
+
+  <!-- Hilfeknöpfe -->
+  <div class="mb-4 flex flex-wrap gap-2">
+    <button onclick="askPreset('Wie fange ich an?')" class="px-3 py-1 bg-mcgreen text-black rounded">Wie fange ich an?</button>
+    <button onclick="askPreset('Java lernen')" class="px-3 py-1 bg-mcgreen text-black rounded">Java lernen</button>
+    <button onclick="askPreset('Spigot Events')" class="px-3 py-1 bg-mcgreen text-black rounded">Spigot Events</button>
+    <button onclick="askPreset('Plugin erstellen')" class="px-3 py-1 bg-mcgreen text-black rounded">Plugin erstellen</button>
+  </div>
 
   <!-- Chat-Auswahl -->
   <div class="mb-4 flex items-center gap-2">
@@ -134,14 +142,14 @@ class MinecraftCodingAI{
   }
 
   answer(input){
-    input = input.trim();
+    input = input.trim().toLowerCase();
 
     // 1️⃣ Chat Antworten
-    if(input.toLowerCase()==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
-    if(input.toLowerCase().includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich kann dir beim Programmieren helfen.`};
+    if(input==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
+    if(input.includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich kann dir beim Programmieren helfen.`};
 
     // 2️⃣ Einstieg in Minecraft Plugin Programmierung
-    if(input.toLowerCase().includes('anfang') || input.toLowerCase().includes('start') || input.toLowerCase().includes('programmieren lernen')){
+    if(input.includes('anfang') || input.includes('start') || input.includes('programmieren lernen')){
         return {type:'explanation', content:
 `Hallo ${playerName}, so fängst du mit Minecraft Plugin Programmierung an:
 1. Installiere IntelliJ IDEA (Community Edition reicht).
@@ -152,10 +160,10 @@ class MinecraftCodingAI{
     }
 
     // 3️⃣ Java / Bukkit / Spigot Erklärung
-    if(input.toLowerCase().includes('playerjoinevent')){
+    if(input.includes('playerjoinevent')){
       return {type:'explanation', content:'PlayerJoinEvent: Wird ausgelöst, wenn ein Spieler den Server betritt.\nBeispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }'};
     }
-    if(input.toLowerCase().includes('commandexecutor')){
+    if(input.includes('commandexecutor')){
       return {type:'explanation', content:'CommandExecutor: Implementiere Befehle im Plugin.\nBeispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){ sender.sendMessage("Befehl ausgeführt!"); return true; }'};
     }
 
@@ -209,7 +217,8 @@ public class ${command.charAt(0).toUpperCase()+command.slice(1)}Plugin extends J
       };
     }
 
-    return {type:'chat', content:`${playerName}, ich kann dazu aktuell keine direkte Antwort geben. Bitte frage nach einem Command, Event oder Plugin.`};
+    // 5️⃣ Smarte Antwort, wenn nichts passt
+    return {type:'chat', content:`${playerName}, ich habe dazu keine direkte Vorlage, aber ich kann dir helfen oder Beispiele zeigen! Frag z.B. nach einem Command, Event, Plugin oder Java-Thema.`};
   }
 
   respond(inputEl){
@@ -246,6 +255,12 @@ function askMC_AI(){
   chats[currentChat].push(`> ${inputEl.value}`);
   chats[currentChat].push(mcAIInstance.outputEl.innerText.split('\n').pop());
   inputEl.value='';
+}
+
+function askPreset(question){
+  if(!currentChat) createChat(); // Auto-create chat
+  document.getElementById('mcAIInput').value = question;
+  askMC_AI();
 }
 
 // =================== MC AI Fenster ===================
