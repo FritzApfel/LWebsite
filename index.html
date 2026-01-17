@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Universelle Coding KI</title>
+<title>Minecraft Plugin Academy - Ultimative Coding KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -19,8 +19,12 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 </header>
 
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Universelle Minecraft Plugin KI</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Frage die KI, um beliebige Plugins zu erstellen, Events zu erklären oder Java-Konzepte zu lernen. Die KI unterscheidet zwischen Chat, Erklärungen und Plugin-Code.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Ultimative Minecraft Plugin KI</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Gib deinen Namen ein und starte die KI. Sie kann alles erklären, Chatten, und Plugins programmieren.</p>
+  <div class="mt-6">
+    <input id="playerNameInput" type="text" placeholder="Dein Name..." class="px-4 py-2 rounded text-black"/>
+    <button onclick="setPlayerName()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded ml-2">Start</button>
+  </div>
 </section>
 
 <main class="max-w-7xl mx-auto px-6 pb-20">
@@ -39,15 +43,25 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 </div>
 
 <!-- Minecraft Coding KI -->
-<div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 p-6">
-  <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white">Schließen</button>
+<div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16">
+  <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white absolute top-6 right-6">Schließen</button>
   <h2 class="text-3xl font-bold mb-4 text-mcgreen">Universelle Minecraft Coding KI</h2>
-  <textarea id="mcAIInput" placeholder="Schreibe eine Frage, einen Plugin-Befehl oder Java-Thema..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
+  <textarea id="mcAIInput" placeholder="Schreibe eine Frage, Plugin-Befehl oder Java-Thema..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
   <button onclick="askMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded mb-4">Frage stellen</button>
   <pre id="mcAIOutput" class="bg-black/80 p-4 rounded text-gray-100 max-w-xl w-full h-96 overflow-auto"></pre>
 </div>
 
 <script>
+let playerName = 'Spieler';
+
+// =================== Spielername ===================
+function setPlayerName(){
+    const input = document.getElementById('playerNameInput').value.trim();
+    if(input) playerName = input;
+    document.getElementById('playerNameInput').parentElement.style.display='none';
+    alert(`Hallo ${playerName}! Die KI ist bereit.`);
+}
+
 // =================== Kapitel Daten ===================
 const chapters = [
   { id:'java', title:'Java Grundlagen', text:'Variablen, Schleifen, Bedingungen, Klassen, Methoden.', methods:[
@@ -109,22 +123,33 @@ class MinecraftCodingAI{
   }
 
   answer(input){
-    input = input.trim();
+    input = input.trim().toLowerCase();
 
-    // 1️⃣ Chat-Antworten
-    if(input.toLowerCase()==='hallo') return {type:'chat', content:'Hallo! Ich kann Plugins erstellen oder Methoden erklären.'};
-    if(input.toLowerCase().includes('wie geht')) return {type:'chat', content:'Mir geht es gut! Ich kann dir beim Programmieren helfen.'};
+    // 1️⃣ Chat Antworten
+    if(input==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
+    if(input.includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich kann dir beim Programmieren helfen.`};
 
-    // 2️⃣ Java / Bukkit / Spigot Erklärung
-    if(input.toLowerCase().includes('playerjoinevent')){
+    // 2️⃣ Einstieg in Minecraft Plugin Programmierung
+    if(input.includes('anfang') || input.includes('start') || input.includes('programmieren lernen')){
+        return {type:'explanation', content:
+`Hallo ${playerName}, so fängst du mit Minecraft Plugin Programmierung an:
+1. Installiere IntelliJ IDEA (Community Edition reicht).
+2. Installiere das "Minecraft Development" Plugin in IntelliJ.
+3. Erstelle ein neues Spigot/Paper Projekt.
+4. Schau dir am besten ein YouTube Video zum Einstieg an: LINK`
+        };
+    }
+
+    // 3️⃣ Java / Bukkit / Spigot Erklärung
+    if(input.includes('playerjoinevent')){
       return {type:'explanation', content:'PlayerJoinEvent: Wird ausgelöst, wenn ein Spieler den Server betritt.\nBeispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }'};
     }
-    if(input.toLowerCase().includes('commandexecutor')){
+    if(input.includes('commandexecutor')){
       return {type:'explanation', content:'CommandExecutor: Implementiere Befehle im Plugin.\nBeispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){ sender.sendMessage("Befehl ausgeführt!"); return true; }'};
     }
 
-    // 3️⃣ Plugin generieren (Commands, Events, GUI)
-    if(input.toLowerCase().includes('plugin') || input.includes('/')){
+    // 4️⃣ Plugin generieren (Commands, Events, GUI)
+    if(input.includes('plugin') || input.includes('/')){
       let command = input.match(/\/\w+/);
       if(command) command = command[0].replace('/',''); else command='meincommand';
       return {type:'plugin', content:
@@ -173,7 +198,7 @@ public class ${command.charAt(0).toUpperCase()+command.slice(1)}Plugin extends J
       };
     }
 
-    return {type:'chat', content:'Ich kann dazu aktuell keine direkte Antwort geben. Bitte frage nach einem Command, Event oder Plugin.'};
+    return {type:'chat', content:`${playerName}, ich kann dazu aktuell keine direkte Antwort geben. Bitte frage nach einem Command, Event oder Plugin.`};
   }
 
   respond(inputEl){
