@@ -1,197 +1,92 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Minecraft Plugin Academy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            mcgreen: '#22c55e',
-            mcdark: '#0f172a'
-          }
-        }
-      }
-    }
-  </script>
+<meta charset="UTF-8" />
+<title>Minecraft Plugin Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { mcgreen: '#22c55e', mcdark: '#0f172a' } } } };
+</script>
 </head>
 <body class="bg-gradient-to-br from-mcdark to-black text-gray-100 min-h-screen">
 
-<!-- NAVBAR -->
 <header class="bg-black/60 backdrop-blur sticky top-0 z-50">
   <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
     <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy</h1>
   </div>
 </header>
 
-<!-- HERO -->
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Lerne Minecraft Plugins Schritt für Schritt</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Egal ob Anfänger oder ohne Vorkenntnisse – wir führen dich vom ersten Java-Code bis zum fertigen Minecraft Plugin.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Alles erklärt vom Anfänger bis zum Profi</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Klicke auf ein Kapitel, um alles darüber zu lernen, inklusive Übersetzungen und Erklärungen aller Methoden.</p>
 </section>
 
-<!-- CONTENT -->
-<main class="max-w-7xl mx-auto px-6 pb-20 grid lg:grid-cols-3 gap-8">
-
-  <!-- Kurse -->
-  <section class="lg:col-span-2">
-    <h3 class="text-2xl font-bold mb-6">📚 Kurse</h3>
-    <div id="courses" class="grid sm:grid-cols-2 gap-6"></div>
-  </section>
-
-  <!-- Fortschritt -->
-  <aside class="bg-white/5 border border-white/10 rounded-xl p-6">
-    <h3 class="text-xl font-bold mb-4">📊 Dein Fortschritt</h3>
-    <ul id="progress" class="space-y-2 text-gray-300"></ul>
-  </aside>
+<main class="max-w-7xl mx-auto px-6 pb-20">
+  <div id="chapterList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </main>
 
-<!-- MODAL -->
-<div id="modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-  <div class="bg-mcdark border border-white/10 rounded-xl w-[480px] p-6">
-    <h2 id="lessonTitle" class="text-xl font-bold mb-3"></h2>
-    <p id="lessonText" class="mb-4 text-gray-300"></p>
-    <pre class="bg-black/80 text-green-400 p-4 rounded-lg text-sm overflow-auto mb-4"><code id="lessonCode"></code></pre>
-
-    <!-- Interaktiver Editor -->
-    <textarea id="editor" class="w-full h-32 bg-black/90 text-green-300 p-2 rounded mb-4 font-mono" placeholder="Schreibe deinen Code hier..."></textarea>
-    <button onclick="runCode()" class="px-4 py-2 rounded bg-mcgreen text-black font-bold mb-4">Code testen</button>
-    <pre id="output" class="bg-black/80 text-yellow-400 p-2 rounded text-sm mb-4 h-24 overflow-auto"></pre>
-
-    <div class="flex justify-end gap-2">
-      <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-700">Schließen</button>
-      <button onclick="finishLesson()" class="px-4 py-2 rounded bg-mcgreen text-black font-bold">Nächstes Kapitel</button>
-    </div>
+<div id="chapterPage" class="hidden fixed inset-0 bg-black/90 overflow-auto p-10 z-50">
+  <button onclick="closeChapter()" class="mb-6 px-4 py-2 bg-red-600 rounded text-white">Zurück</button>
+  <div class="bg-mcdark p-6 rounded-lg max-w-4xl mx-auto">
+    <h2 id="chapterTitle" class="text-3xl font-bold mb-4"></h2>
+    <p id="chapterText" class="mb-4 text-gray-300"></p>
+    <h3 class="text-2xl font-bold mb-2">Methoden & Erklärungen</h3>
+    <div id="methodsList" class="space-y-3"></div>
   </div>
 </div>
 
 <script>
 // ================= DATEN =================
-const courses = [
+const chapters = [
   {
     id: 'java',
     title: 'Java Grundlagen',
-    chapters: [
-      {
-        title: 'Was ist Java?',
-        lesson: {
-          text: 'Java ist eine objektorientierte Sprache. Wir starten mit einfachen Beispielen.',
-          code: 'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello Minecraft!");\n  }\n}'
-        }
-      },
-      {
-        title: 'Variablen & Datentypen',
-        lesson: {
-          text: 'Variablen speichern Werte. Wir erklären int, String, boolean etc.',
-          code: 'int spieler = 10;\nString name = "Steve";\nboolean online = true;'
-        }
-      }
+    text: 'Java ist eine objektorientierte Sprache, die wir für Minecraft Plugins nutzen. Alles wird Schritt für Schritt erklärt.',
+    methods: [
+      {name: 'System.out.println', desc: 'Gibt Text in der Konsole aus.'},
+      {name: 'int', desc: 'Ganzzahl, speichert Zahlen ohne Dezimalen.'},
+      {name: 'String', desc: 'Speichert Text.'}
     ]
   },
   {
     id: 'spigot',
-    title: 'Spigot Plugin Basics',
-    chapters: [
-      {
-        title: 'Plugin Struktur',
-        lesson: {
-          text: 'Jedes Plugin hat eine Hauptklasse, die von JavaPlugin erbt.',
-          code: 'public class MyPlugin extends JavaPlugin {\n  @Override\n  public void onEnable() {\n    getLogger().info("Plugin gestartet");\n  }\n}'
-        }
-      }
+    title: 'Spigot Plugins',
+    text: 'Ein Spigot Plugin erweitert Minecraft Server. Wir erklären die Struktur und die wichtigsten Methoden.',
+    methods: [
+      {name: 'onEnable', desc: 'Wird aufgerufen, wenn das Plugin gestartet wird.'},
+      {name: 'getLogger', desc: 'Gibt den Logger zurück, um Nachrichten an die Konsole zu senden.'},
+      {name: 'PlayerJoinEvent', desc: 'Ein Event, das ausgelöst wird, wenn ein Spieler den Server betritt.'}
     ]
   }
 ];
 
-let progress = {};
-let activeCourse;
-let activeChapter;
-
 // ================= UI =================
-function renderCourses() {
-  const el = document.getElementById('courses');
-  el.innerHTML = '';
+const chapterListEl = document.getElementById('chapterList');
+chapters.forEach(ch => {
+  const div = document.createElement('div');
+  div.className = 'bg-white/5 border border-white/10 rounded-xl p-5 hover:border-mcgreen cursor-pointer';
+  div.innerHTML = `<h3 class='text-lg font-bold'>${ch.title}</h3>`;
+  div.onclick = () => openChapter(ch.id);
+  chapterListEl.appendChild(div);
+});
 
-  courses.forEach(course => {
-    const done = progress[course.id] || 0;
-    const total = course.chapters.length;
-    const percent = Math.min(100, (done / total) * 100);
-
-    el.innerHTML += `
-      <div class="bg-white/5 border border-white/10 rounded-xl p-5">
-        <h4 class="text-lg font-bold">${course.title}</h4>
-        <p class="text-sm text-gray-400 mb-2">${done} / ${total} Kapitel</p>
-        <div class="w-full h-2 bg-black/40 rounded mb-3">
-          <div class="h-2 bg-mcgreen rounded" style="width:${percent}%"></div>
-        </div>
-        <button onclick="openCourse('${course.id}')" class="bg-mcgreen text-black font-bold px-4 py-2 rounded w-full">Kurs öffnen</button>
-      </div>`;
+function openChapter(id) {
+  const ch = chapters.find(c => c.id === id);
+  if(!ch) return;
+  document.getElementById('chapterTitle').innerText = ch.title;
+  document.getElementById('chapterText').innerText = ch.text;
+  const methodsEl = document.getElementById('methodsList');
+  methodsEl.innerHTML = '';
+  ch.methods.forEach(m => {
+    methodsEl.innerHTML += `<div class='bg-black/70 p-3 rounded'><strong>${m.name}</strong>: ${m.desc}</div>`;
   });
+  document.getElementById('chapterPage').classList.remove('hidden');
 }
 
-function renderProgress() {
-  const el = document.getElementById('progress');
-  el.innerHTML = '';
-  for (const key in progress) {
-    el.innerHTML += `<li>${key}: ${progress[key]} Kapitel abgeschlossen</li>`;
-  }
+function closeChapter() {
+  document.getElementById('chapterPage').classList.add('hidden');
 }
-
-// ================= LESSON =================
-function openCourse(courseId) {
-  activeCourse = courses.find(c => c.id === courseId);
-  activeChapter = 0;
-  openLesson(activeChapter);
-}
-
-function openLesson(chapterIndex) {
-  if (!activeCourse) return;
-  const chapter = activeCourse.chapters[chapterIndex];
-  if (!chapter) return;
-
-  activeChapter = chapterIndex;
-  document.getElementById('lessonTitle').innerText = chapter.title;
-  document.getElementById('lessonText').innerText = chapter.lesson.text;
-  document.getElementById('lessonCode').innerText = chapter.lesson.code;
-  document.getElementById('editor').value = chapter.lesson.code;
-  document.getElementById('output').innerText = '';
-  document.getElementById('modal').classList.remove('hidden');
-}
-
-function closeModal() {
-  document.getElementById('modal').classList.add('hidden');
-}
-
-function finishLesson() {
-  if (!activeCourse) return;
-  progress[activeCourse.id] = (progress[activeCourse.id] || 0) + 1;
-  closeModal();
-  renderCourses();
-  renderProgress();
-  if (activeChapter + 1 < activeCourse.chapters.length) {
-    openLesson(activeChapter + 1);
-  }
-}
-
-// ================= RUN CODE =================
-function runCode() {
-  const code = document.getElementById('editor').value;
-  try {
-    // Achtung: eval kann gefährlich sein, hier nur für Lernzwecke
-    const result = eval(code);
-    document.getElementById('output').innerText = result === undefined ? 'Code ausgeführt!' : result;
-  } catch (e) {
-    document.getElementById('output').innerText = 'Fehler: ' + e.message;
-  }
-}
-
-renderCourses();
-renderProgress();
 </script>
 
 </body>
