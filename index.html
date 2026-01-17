@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Dummy KI</title>
+<title>Minecraft Plugin Academy - Intelligente Dummy-KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -69,7 +69,7 @@ function setPlayerName(){
   alert(`Hallo ${playerName}! Die KI ist bereit.`);
 }
 
-// Dummy Minecraft Coding KI
+// Dummy KI, reagiert intelligent wie echte KI
 class MinecraftCodingAI {
   constructor(outputEl){ this.outputEl = outputEl; }
 
@@ -80,7 +80,24 @@ class MinecraftCodingAI {
 
     this.outputEl.innerText += `\n[KI denkt...]`;
 
-    const answer = `[Dummy-Antwort] Ich kann auf deine Frage antworten: "${question}". Ich erkläre alles rund um Minecraft Plugins, Commands, GUI und Java.`;
+    const q = question.toLowerCase();
+    let answer='';
+
+    if(/anfang|start|beginnen/.test(q)){
+      answer=`Hallo ${playerName}! Um mit Minecraft Plugins zu starten:\n`+
+             `1. Java Grundlagen lernen\n2. IntelliJ IDEA installieren\n3. Spigot/Paper-Projekt erstellen\n4. Tutorials anschauen\n`+
+             `Beispiel:\npublic class MeinPlugin extends JavaPlugin {\n  @Override\n  public void onEnable() {\n    getLogger().info("Plugin aktiviert!");\n  }\n}`;
+    } else if(/command/.test(q)) {
+      answer=`CommandExecutor Beispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {\n  sender.sendMessage("Befehl ausgeführt!");\n  return true;\n}`;
+    } else if(/event|join/.test(q)) {
+      answer=`PlayerJoinEvent Beispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e) {\n  e.getPlayer().sendMessage("Willkommen auf dem Server!");\n}`;
+    } else if(/gui/.test(q)) {
+      answer=`GUI Beispiel:\nInventory inv = Bukkit.createInventory(player, 9, "Mein GUI");\nplayer.openInventory(inv);`;
+    } else {
+      answer=`[Dummy-KI] Ich habe deine Frage verstanden: "${question}"\n`+
+             `Ich kann dir bei Minecraft Plugins, Java, Commands, Events, GUI und Spigot/Paper helfen.\n`+
+             `Stelle deine Frage genauer für ein Beispiel oder Code-Snippet.`;
+    }
 
     this.outputEl.innerText += `\n[Antwort]\n${answer}`;
 
@@ -95,21 +112,21 @@ const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput')
 
 function createChat(){
   const name = document.getElementById('newChatName').value.trim() || 'StandardChat';
-  if(!chats[name]) chats[name] = [];
-  currentChat = name;
+  if(!chats[name]) chats[name]=[];
+  currentChat=name;
 
-  const chatListEl = document.getElementById('chatList');
+  const chatListEl=document.getElementById('chatList');
   chatListEl.innerHTML='';
   for(const chatName in chats){
     chatListEl.innerHTML += `<button onclick="switchChat('${chatName}')" class='px-2 py-1 bg-mcgreen text-black rounded'>${chatName}</button>`;
   }
 
-  mcAIInstance.outputEl.innerText = '';
+  mcAIInstance.outputEl.innerText='';
 }
 
 function switchChat(name){
-  currentChat = name;
-  mcAIInstance.outputEl.innerText = chats[name].join('\n');
+  currentChat=name;
+  mcAIInstance.outputEl.innerText=chats[name].join('\n');
 }
 
 function askMC_AI(){
@@ -118,7 +135,7 @@ function askMC_AI(){
 
 function askPreset(question){
   if(!currentChat) createChat();
-  document.getElementById('mcAIInput').value = question;
+  document.getElementById('mcAIInput').value=question;
   askMC_AI();
 }
 
