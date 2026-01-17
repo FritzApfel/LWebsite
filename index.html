@@ -31,7 +31,6 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
   <div id="chapterList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </main>
 
-<!-- Kapitel Overlay -->
 <div id="chapterPage" class="hidden fixed inset-0 bg-black/90 overflow-auto p-10 z-50">
   <button onclick="closeChapter()" class="mb-6 px-4 py-2 bg-red-600 rounded text-white">Zurück</button>
   <div class="bg-mcdark p-6 rounded-lg max-w-4xl mx-auto">
@@ -42,15 +41,11 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
   </div>
 </div>
 
-<!-- Minecraft Coding KI -->
 <div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16 overflow-auto">
   <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white absolute top-6 right-6">Schließen</button>
   <h2 class="text-3xl font-bold mb-4 text-mcgreen">Universelle Minecraft Coding KI</h2>
   <div class="mb-4 flex flex-wrap gap-2">
     <button onclick="askPreset('Wie fange ich an?')" class="px-3 py-1 bg-mcgreen text-black rounded">Wie fange ich an?</button>
-    <button onclick="askPreset('Java lernen')" class="px-3 py-1 bg-mcgreen text-black rounded">Java lernen</button>
-    <button onclick="askPreset('Spigot Events')" class="px-3 py-1 bg-mcgreen text-black rounded">Spigot Events</button>
-    <button onclick="askPreset('Plugin erstellen')" class="px-3 py-1 bg-mcgreen text-black rounded">Plugin erstellen</button>
   </div>
   <div class="mb-4 flex items-center gap-2">
     <input id="newChatName" placeholder="Neuen Chatnamen eingeben..." class="px-3 py-1 rounded text-black"/>
@@ -104,45 +99,61 @@ function openChapter(id){
 }
 function closeChapter(){document.getElementById('chapterPage').classList.add('hidden');}
 
-class MinecraftCodingAI{
-  constructor(outputEl){this.outputEl=outputEl;}
-  answer(input){
-    input=input.trim().toLowerCase();
-    if(input==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
-    if(input.includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich helfe dir beim Programmieren.`};
-    if(input.includes('anfang')||input.includes('start')||input.includes('programmieren lernen')){
-      return {type:'explanation', content:`Hallo ${playerName}, so fängst du an:\n1. IntelliJ IDEA installieren\n2. Minecraft Development Plugin installieren\n3. Neues Spigot/Paper Projekt erstellen\n4. YouTube Tutorials anschauen`};
+class MinecraftCodingAI {
+  constructor(outputEl) { this.outputEl = outputEl; }
+
+  async respondGPT(inputEl) {
+    const question = inputEl.value.trim();
+    if (!question) return;
+    if (!currentChat) return alert("Erstelle zuerst einen Chat!");
+
+    this.outputEl.innerText += `\n[KI denkt...]`;
+
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer DEIN_API_KEY_HIER'
+        },
+        body: JSON.stringify({
+          model: "gpt-4",
+          messages: [
+            {role: "system", content: "Du bist eine Minecraft-Experten-KI. Antworte immer auf Deutsch, alles erklären, Beispiele geben, Plugins, Commands, GUI, Java-Code wenn nötig."},
+            {role: "user", content: question}
+          ],
+          temperature: 0.5
+        })
+      });
+
+      const data = await res.json();
+      const answer = data.choices[0].message.content;
+
+      this.outputEl.innerText += `\n[Antwort]\n${answer}`;
+      chats[currentChat].push(`> ${question}`);
+      chats[currentChat].push(answer);
+      inputEl.value = '';
+    } catch (err) {
+      this.outputEl.innerText += `\n[Fehler] KI konnte nicht antworten: ${err}`;
     }
-    if(input.includes('playerjoinevent')) return {type:'explanation', content:'PlayerJoinEvent Beispiel: @EventHandler public void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }'};
-    if(input.includes('commandexecutor')) return {type:'explanation', content:'CommandExecutor Beispiel: @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){ sender.sendMessage("Befehl ausgeführt!"); return true; }'};
-    if(input.includes('plugin')||input.includes('/')){
-      let command=input.match(/\/\w+/); command=command?command[0].replace('/',''):'meincommand';
-      return {type:'plugin', content:`// Fertiges Plugin: ${command.charAt(0).toUpperCase()+command.slice(1)}Plugin\npackage com.deinplugin;\nimport org.bukkit.*;\nimport org.bukkit.command.*;\nimport org.bukkit.entity.Player;\nimport org.bukkit.event.Listener;\nimport org.bukkit.inventory.*;\nimport org.bukkit.plugin.java.JavaPlugin;\npublic class ${command.charAt(0).toUpperCase()+command.slice(1)}Plugin extends JavaPlugin implements Listener{ @Override public void onEnable(){ getLogger().info("${command} Plugin aktiviert"); getServer().getPluginManager().registerEvents(this,this);} @Override public void onDisable(){ getLogger().info("${command} Plugin deaktiviert");} @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){ if(cmd.getName().equalsIgnoreCase("${command}") && sender instanceof Player){ Player player=(Player)sender; player.setHealth(player.getMaxHealth()); player.sendMessage("Du wurdest geheilt!"); Inventory inv=Bukkit.createInventory(player,9,"GUI Beispiel"); ItemStack item=new ItemStack(Material.DIAMOND); inv.setItem(0,item); player.openInventory(inv); return true;} return false;}}`};
-    }
-    return {type:'chat', content:`${playerName}, ich habe dazu keine direkte Vorlage, aber ich kann dir helfen! Frag nach Commands, Events, Plugins oder Java.`};
-  }
-  respond(inputEl){
-    const res=this.answer(inputEl.value);
-    if(!currentChat) return alert("Erstelle zuerst einen Chat!");
-    if(res.type==='chat') this.outputEl.innerHTML+=`\n[Chat] ${res.content}`;
-    if(res.type==='explanation') this.outputEl.innerHTML+=`\n[Erklärung] ${res.content}`;
-    if(res.type==='plugin') this.outputEl.innerHTML+=`\n[Plugin-Code]\n${res.content}`;
   }
 }
 
-const mcAIInstance=new MinecraftCodingAI(document.getElementById('mcAIOutput'));
-function createChat(){
-  const name=document.getElementById('newChatName').value.trim();
-  if(!name) return; if(chats[name]) return alert("Chat existiert bereits!");
-  chats[name]=[]; currentChat=name;
-  document.getElementById('chatList').innerHTML+=`<button onclick="switchChat('${name}')" class="px-2 py-1 bg-mcgreen text-black rounded">${name}</button>`;
-  mcAIInstance.outputEl.innerText='';
+const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
+
+function createChat() {
+  const name = 'StandardChat';
+  if (!chats[name]) chats[name] = [];
+  currentChat = name;
+  document.getElementById('chatList').innerHTML = `<button onclick="switchChat('${name}')" class="px-2 py-1 bg-mcgreen text-black rounded">${name}</button>`;
+  mcAIInstance.outputEl.innerText = '';
 }
-function switchChat(name){ currentChat=name; mcAIInstance.outputEl.innerText=chats[name].join('\n'); }
-function askMC_AI(){ if(!currentChat) return alert("Erstelle zuerst einen Chat!"); const inputEl=document.getElementById('mcAIInput'); mcAIInstance.respond(inputEl); chats[currentChat].push(`> ${inputEl.value}`); chats[currentChat].push(mcAIInstance.outputEl.innerText.split('\n').pop()); inputEl.value=''; }
-function askPreset(question){ if(!currentChat) createChat(); document.getElementById('mcAIInput').value=question; askMC_AI(); }
-function openMC_AI(){ document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value=''; document.getElementById('mcAIOutput').innerText=''; }
-function closeMC_AI(){ document.getElementById('mcAI').classList.add('hidden'); }
+
+function switchChat(name) { currentChat = name; mcAIInstance.outputEl.innerText = chats[name].join('\n'); }
+function askMC_AI() { mcAIInstance.respondGPT(document.getElementById('mcAIInput')); }
+function askPreset(question) { if (!currentChat) createChat(); document.getElementById('mcAIInput').value = question; askMC_AI(); }
+function openMC_AI() { document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value = ''; document.getElementById('mcAIOutput').innerText = ''; }
+function closeMC_AI() { document.getElementById('mcAI').classList.add('hidden'); }
 </script>
 
 </body>
