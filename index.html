@@ -31,8 +31,8 @@
 
 <!-- HERO -->
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Lerne Minecraft Plugins zu coden</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Von Java Basics bis zu professionellen Spigot & Paper Plugins – alles interaktiv und zum Ausprobieren.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Lerne Minecraft Plugins Schritt für Schritt</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Egal ob Anfänger oder ohne Vorkenntnisse – wir führen dich vom ersten Java-Code bis zum fertigen Minecraft Plugin.</p>
 </section>
 
 <!-- CONTENT -->
@@ -53,13 +53,19 @@
 
 <!-- MODAL -->
 <div id="modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-  <div class="bg-mcdark border border-white/10 rounded-xl w-[420px] p-6">
+  <div class="bg-mcdark border border-white/10 rounded-xl w-[480px] p-6">
     <h2 id="lessonTitle" class="text-xl font-bold mb-3"></h2>
     <p id="lessonText" class="mb-4 text-gray-300"></p>
     <pre class="bg-black/80 text-green-400 p-4 rounded-lg text-sm overflow-auto mb-4"><code id="lessonCode"></code></pre>
+
+    <!-- Interaktiver Editor -->
+    <textarea id="editor" class="w-full h-32 bg-black/90 text-green-300 p-2 rounded mb-4 font-mono" placeholder="Schreibe deinen Code hier..."></textarea>
+    <button onclick="runCode()" class="px-4 py-2 rounded bg-mcgreen text-black font-bold mb-4">Code testen</button>
+    <pre id="output" class="bg-black/80 text-yellow-400 p-2 rounded text-sm mb-4 h-24 overflow-auto"></pre>
+
     <div class="flex justify-end gap-2">
       <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-700">Schließen</button>
-      <button onclick="finishLesson()" class="px-4 py-2 rounded bg-mcgreen text-black font-bold">Fertig</button>
+      <button onclick="finishLesson()" class="px-4 py-2 rounded bg-mcgreen text-black font-bold">Nächstes Kapitel</button>
     </div>
   </div>
 </div>
@@ -74,15 +80,15 @@ const courses = [
       {
         title: 'Was ist Java?',
         lesson: {
-          text: 'Java ist eine objektorientierte Programmiersprache. Minecraft Plugins werden fast immer in Java geschrieben.',
+          text: 'Java ist eine objektorientierte Sprache. Wir starten mit einfachen Beispielen.',
           code: 'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello Minecraft!");\n  }\n}'
         }
       },
       {
-        title: 'Variablen',
+        title: 'Variablen & Datentypen',
         lesson: {
-          text: 'Variablen speichern Werte wie Zahlen oder Texte.',
-          code: 'int spieler = 10;\nString name = "Steve";'
+          text: 'Variablen speichern Werte. Wir erklären int, String, boolean etc.',
+          code: 'int spieler = 10;\nString name = "Steve";\nboolean online = true;'
         }
       }
     ]
@@ -94,7 +100,7 @@ const courses = [
       {
         title: 'Plugin Struktur',
         lesson: {
-          text: 'Jedes Plugin hat eine main class, die von JavaPlugin erbt.',
+          text: 'Jedes Plugin hat eine Hauptklasse, die von JavaPlugin erbt.',
           code: 'public class MyPlugin extends JavaPlugin {\n  @Override\n  public void onEnable() {\n    getLogger().info("Plugin gestartet");\n  }\n}'
         }
       }
@@ -152,6 +158,8 @@ function openLesson(chapterIndex) {
   document.getElementById('lessonTitle').innerText = chapter.title;
   document.getElementById('lessonText').innerText = chapter.lesson.text;
   document.getElementById('lessonCode').innerText = chapter.lesson.code;
+  document.getElementById('editor').value = chapter.lesson.code;
+  document.getElementById('output').innerText = '';
   document.getElementById('modal').classList.remove('hidden');
 }
 
@@ -165,9 +173,20 @@ function finishLesson() {
   closeModal();
   renderCourses();
   renderProgress();
-  // Automatisch nächstes Kapitel öffnen
   if (activeChapter + 1 < activeCourse.chapters.length) {
     openLesson(activeChapter + 1);
+  }
+}
+
+// ================= RUN CODE =================
+function runCode() {
+  const code = document.getElementById('editor').value;
+  try {
+    // Achtung: eval kann gefährlich sein, hier nur für Lernzwecke
+    const result = eval(code);
+    document.getElementById('output').innerText = result === undefined ? 'Code ausgeführt!' : result;
+  } catch (e) {
+    document.getElementById('output').innerText = 'Fehler: ' + e.message;
   }
 }
 
