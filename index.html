@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
-<title>Minecraft Plugin Academy</title>
+<title>Minecraft Plugin Academy - Komplettes Coding</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -13,13 +13,13 @@
 
 <header class="bg-black/60 backdrop-blur sticky top-0 z-50">
   <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy</h1>
+    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy - Komplettes Coding</h1>
   </div>
 </header>
 
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Alles erklärt vom Anfänger bis zum Profi</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Klicke auf ein Kapitel, um alles darüber zu lernen, inklusive Übersetzungen und Erklärungen aller Methoden.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Alles über Programmieren lernen</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Vom Anfänger bis Profi: Alle Konzepte, Methoden, Strukturen und Minecraft-spezifische Funktionen erklärt. Klick auf ein Kapitel, um es zu öffnen.</p>
 </section>
 
 <main class="max-w-7xl mx-auto px-6 pb-20">
@@ -39,52 +39,62 @@
 <script>
 // ================= DATEN =================
 const chapters = [
-  {
-    id: 'java',
-    title: 'Java Grundlagen',
-    text: 'Java ist eine objektorientierte Sprache, die wir für Minecraft Plugins nutzen. Alles wird Schritt für Schritt erklärt.',
-    methods: [
-      {name: 'System.out.println', desc: 'Gibt Text in der Konsole aus.'},
-      {name: 'int', desc: 'Ganzzahl, speichert Zahlen ohne Dezimalen.'},
-      {name: 'String', desc: 'Speichert Text.'}
-    ]
-  },
-  {
-    id: 'spigot',
-    title: 'Spigot Plugins',
-    text: 'Ein Spigot Plugin erweitert Minecraft Server. Wir erklären die Struktur und die wichtigsten Methoden.',
-    methods: [
-      {name: 'onEnable', desc: 'Wird aufgerufen, wenn das Plugin gestartet wird.'},
-      {name: 'getLogger', desc: 'Gibt den Logger zurück, um Nachrichten an die Konsole zu senden.'},
-      {name: 'PlayerJoinEvent', desc: 'Ein Event, das ausgelöst wird, wenn ein Spieler den Server betritt.'}
-    ]
-  }
+  { id: 'java', title: 'Java Grundlagen', text: 'Alle wichtigen Java Grundlagen: Syntax, Variablen, Schleifen, Bedingungen, Klassen, Objekte, Methoden.', methods: [
+    {name:'System.out.println', desc:'Gibt Text in der Konsole aus.'},
+    {name:'int', desc:'Ganzzahl, speichert Zahlen.'},
+    {name:'String', desc:'Text/Zeichenkette.'},
+    {name:'for-Schleife', desc:'Wiederholt einen Block mehrfach.'},
+    {name:'if/else', desc:'Bedingte Anweisungen.'},
+    {name:'class', desc:'Definiert eine Klasse.'},
+    {name:'new', desc:'Erstellt ein neues Objekt.'},
+    {name:'void', desc:'Funktion gibt nichts zurück.'}
+  ]},
+  { id: 'oop', title: 'Objektorientierte Programmierung', text:'Klassen, Objekte, Vererbung, Interfaces, Polymorphismus alles erklärt mit Beispielen.', methods:[
+    {name:'extends', desc:'Erbt Funktionen und Eigenschaften einer Klasse.'},
+    {name:'implements', desc:'Implementiert ein Interface.'},
+    {name:'super', desc:'Zugriff auf die Elternklasse.'},
+    {name:'this', desc:'Referenz auf das aktuelle Objekt.'}
+  ]},
+  { id:'spigot', title:'Spigot Plugins', text:'Minecraft Plugin Entwicklung: Events, Commands, Listener, Konfigurationen, Player Interaction.', methods:[
+    {name:'onEnable', desc:'Wird ausgeführt, wenn das Plugin startet.'},
+    {name:'onDisable', desc:'Wird ausgeführt, wenn das Plugin stoppt.'},
+    {name:'getLogger', desc:'Logger für die Konsole.'},
+    {name:'PlayerJoinEvent', desc:'Event für Spieler Join.'},
+    {name:'CommandExecutor', desc:'Erstellt Befehle für den Server.'}
+  ]},
+  { id:'advanced', title:'Fortgeschrittene Konzepte', text:'Threads, Collections, Streams, Lambda, Exception Handling, APIs, Datenbanken, Best Practices.', methods:[
+    {name:'try/catch', desc:'Fehlerbehandlung.'},
+    {name:'ArrayList', desc:'Dynamische Liste.'},
+    {name:'HashMap', desc:'Key-Value Speicher.'},
+    {name:'Lambda', desc:'Kurze Funktionsdefinition.'},
+    {name:'Thread', desc:'Nebenläufige Ausführung.'}
+  ]}
 ];
 
 // ================= UI =================
 const chapterListEl = document.getElementById('chapterList');
 chapters.forEach(ch => {
   const div = document.createElement('div');
-  div.className = 'bg-white/5 border border-white/10 rounded-xl p-5 hover:border-mcgreen cursor-pointer';
-  div.innerHTML = `<h3 class='text-lg font-bold'>${ch.title}</h3>`;
-  div.onclick = () => openChapter(ch.id);
+  div.className='bg-white/5 border border-white/10 rounded-xl p-5 hover:border-mcgreen cursor-pointer';
+  div.innerHTML=`<h3 class='text-lg font-bold'>${ch.title}</h3>`;
+  div.onclick=()=>openChapter(ch.id);
   chapterListEl.appendChild(div);
 });
 
-function openChapter(id) {
-  const ch = chapters.find(c => c.id === id);
+function openChapter(id){
+  const ch = chapters.find(c=>c.id===id);
   if(!ch) return;
-  document.getElementById('chapterTitle').innerText = ch.title;
-  document.getElementById('chapterText').innerText = ch.text;
-  const methodsEl = document.getElementById('methodsList');
-  methodsEl.innerHTML = '';
-  ch.methods.forEach(m => {
-    methodsEl.innerHTML += `<div class='bg-black/70 p-3 rounded'><strong>${m.name}</strong>: ${m.desc}</div>`;
+  document.getElementById('chapterTitle').innerText=ch.title;
+  document.getElementById('chapterText').innerText=ch.text;
+  const methodsEl=document.getElementById('methodsList');
+  methodsEl.innerHTML='';
+  ch.methods.forEach(m=>{
+    methodsEl.innerHTML+=`<div class='bg-black/70 p-3 rounded'><strong>${m.name}</strong>: ${m.desc}</div>`;
   });
   document.getElementById('chapterPage').classList.remove('hidden');
 }
 
-function closeChapter() {
+function closeChapter(){
   document.getElementById('chapterPage').classList.add('hidden');
 }
 </script>
