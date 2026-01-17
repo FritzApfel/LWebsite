@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Ultimative Coding KI</title>
+<title>Minecraft Plugin Academy  - Ultimative KI by Fabian</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -20,7 +20,7 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 
 <section class="text-center py-16">
   <h2 class="text-4xl font-extrabold mb-4">Ultimative Minecraft Plugin KI</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Gib deinen Namen ein und starte die KI. Sie kann alles erklären, Chatten, und Plugins programmieren.</p>
+  <p class="text-gray-400 max-w-xl mx-auto">Gib deinen Namen ein und starte die KI. Sie kann alles erklären, Chatten und Plugins programmieren.</p>
   <div class="mt-6">
     <input id="playerNameInput" type="text" placeholder="Dein Name..." class="px-4 py-2 rounded text-black"/>
     <button onclick="setPlayerName()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded ml-2">Start</button>
@@ -46,6 +46,15 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 <div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16">
   <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white absolute top-6 right-6">Schließen</button>
   <h2 class="text-3xl font-bold mb-4 text-mcgreen">Universelle Minecraft Coding KI</h2>
+
+  <!-- Chat-Auswahl -->
+  <div class="mb-4 flex items-center gap-2">
+    <input id="newChatName" placeholder="Neuen Chatnamen eingeben..." class="px-3 py-1 rounded text-black"/>
+    <button onclick="createChat()" class="px-3 py-1 bg-mcgreen text-black rounded">Chat erstellen</button>
+  </div>
+  <div id="chatList" class="flex gap-2 mb-4 overflow-x-auto"></div>
+
+  <!-- Chat Input -->
   <textarea id="mcAIInput" placeholder="Schreibe eine Frage, Plugin-Befehl oder Java-Thema..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
   <button onclick="askMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded mb-4">Frage stellen</button>
   <pre id="mcAIOutput" class="bg-black/80 p-4 rounded text-gray-100 max-w-xl w-full h-96 overflow-auto"></pre>
@@ -53,6 +62,8 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 
 <script>
 let playerName = 'Spieler';
+let chats = {};
+let currentChat = null;
 
 // =================== Spielername ===================
 function setPlayerName(){
@@ -116,21 +127,21 @@ function openChapter(id){
 }
 function closeChapter(){document.getElementById('chapterPage').classList.add('hidden');}
 
-// =================== Universelle Minecraft Coding KI ===================
+// =================== Minecraft Coding KI ===================
 class MinecraftCodingAI{
   constructor(outputEl){
     this.outputEl = outputEl;
   }
 
   answer(input){
-    input = input.trim().toLowerCase();
+    input = input.trim();
 
     // 1️⃣ Chat Antworten
-    if(input==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
-    if(input.includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich kann dir beim Programmieren helfen.`};
+    if(input.toLowerCase()==='hallo') return {type:'chat', content:`Hallo ${playerName}! Ich kann Plugins erstellen oder Methoden erklären.`};
+    if(input.toLowerCase().includes('wie geht')) return {type:'chat', content:`Mir geht es gut, ${playerName}! Ich kann dir beim Programmieren helfen.`};
 
     // 2️⃣ Einstieg in Minecraft Plugin Programmierung
-    if(input.includes('anfang') || input.includes('start') || input.includes('programmieren lernen')){
+    if(input.toLowerCase().includes('anfang') || input.toLowerCase().includes('start') || input.toLowerCase().includes('programmieren lernen')){
         return {type:'explanation', content:
 `Hallo ${playerName}, so fängst du mit Minecraft Plugin Programmierung an:
 1. Installiere IntelliJ IDEA (Community Edition reicht).
@@ -141,10 +152,10 @@ class MinecraftCodingAI{
     }
 
     // 3️⃣ Java / Bukkit / Spigot Erklärung
-    if(input.includes('playerjoinevent')){
+    if(input.toLowerCase().includes('playerjoinevent')){
       return {type:'explanation', content:'PlayerJoinEvent: Wird ausgelöst, wenn ein Spieler den Server betritt.\nBeispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }'};
     }
-    if(input.includes('commandexecutor')){
+    if(input.toLowerCase().includes('commandexecutor')){
       return {type:'explanation', content:'CommandExecutor: Implementiere Befehle im Plugin.\nBeispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){ sender.sendMessage("Befehl ausgeführt!"); return true; }'};
     }
 
@@ -203,17 +214,44 @@ public class ${command.charAt(0).toUpperCase()+command.slice(1)}Plugin extends J
 
   respond(inputEl){
     const res = this.answer(inputEl.value);
-    if(res.type==='chat') this.outputEl.innerHTML=`<span class="text-mcchat">${res.content}</span>`;
-    if(res.type==='explanation') this.outputEl.innerHTML=`<span class="text-mcyellow">${res.content}</span>`;
-    if(res.type==='plugin') this.outputEl.innerHTML=`<span class="text-mcblue font-mono">${res.content}</span>`;
+    if(!currentChat) return alert("Erstelle zuerst einen Chat!");
+    if(res.type==='chat') this.outputEl.innerHTML+=`\n[Chat] ${res.content}`;
+    if(res.type==='explanation') this.outputEl.innerHTML+=`\n[Erklärung] ${res.content}`;
+    if(res.type==='plugin') this.outputEl.innerHTML+=`\n[Plugin-Code]\n${res.content}`;
   }
 }
 
+// =================== Chat-Management ===================
 const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
+
+function createChat(){
+  const name = document.getElementById('newChatName').value.trim();
+  if(!name) return;
+  if(chats[name]) return alert("Chat existiert bereits!");
+  chats[name] = [];
+  currentChat = name;
+  document.getElementById('chatList').innerHTML+=`<button onclick="switchChat('${name}')" class="px-2 py-1 bg-mcgreen text-black rounded">${name}</button>`;
+  mcAIInstance.outputEl.innerText = '';
+}
+
+function switchChat(name){
+  currentChat = name;
+  mcAIInstance.outputEl.innerText = chats[name].join('\n');
+}
+
+function askMC_AI(){
+  if(!currentChat) return alert("Erstelle zuerst einen Chat!");
+  const inputEl = document.getElementById('mcAIInput');
+  mcAIInstance.respond(inputEl);
+  chats[currentChat].push(`> ${inputEl.value}`);
+  chats[currentChat].push(mcAIInstance.outputEl.innerText.split('\n').pop());
+  inputEl.value='';
+}
+
+// =================== MC AI Fenster ===================
 function openMC_AI(){ document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value=''; document.getElementById('mcAIOutput').innerText=''; }
 function closeMC_AI(){ document.getElementById('mcAI').classList.add('hidden'); }
-function askMC_AI(){ mcAIInstance.respond(document.getElementById('mcAIInput')); }
-</script>
 
+</script>
 </body>
 </html>
