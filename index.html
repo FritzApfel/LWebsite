@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Ultimative KI</title>
+<title>Minecraft Plugin Academy - Dummy KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -69,74 +69,68 @@ function setPlayerName(){
   alert(`Hallo ${playerName}! Die KI ist bereit.`);
 }
 
-const chapters=[ /* gleiche Kapitel wie vorher */ ];
-
-const chapterListEl=document.getElementById('chapterList');
-chapters.forEach(ch=>{
-  const div=document.createElement('div');
-  div.className='bg-white/5 border border-white/10 rounded-xl p-5 hover:border-mcgreen cursor-pointer';
-  div.innerHTML=`<h3 class='text-lg font-bold'>${ch.title}</h3>`;
-  div.onclick=()=>openChapter(ch.id);
-  chapterListEl.appendChild(div);
-});
-
-function openChapter(id){ /* gleiche Funktion */ }
-function closeChapter(){ /* gleiche Funktion */ }
-
-// =================== KI-Klasse mit Proxy ===================
+// Dummy Minecraft Coding KI
 class MinecraftCodingAI {
-  constructor(outputEl) { this.outputEl = outputEl; }
+  constructor(outputEl){ this.outputEl = outputEl; }
 
-  async respondGPT(inputEl) {
+  async respondDummy(inputEl){
     const question = inputEl.value.trim();
-    if (!question) return;
-    if (!currentChat) return alert("Erstelle zuerst einen Chat!");
+    if(!question) return;
+    if(!currentChat) return alert("Erstelle zuerst einen Chat!");
 
     this.outputEl.innerText += `\n[KI denkt...]`;
 
-    try {
-      // Proxy-Server auf localhost oder eigener Server
-      const res = await fetch('http://localhost:3000/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            {role: 'system', content: 'Du bist eine Minecraft-Experten-KI. Antworte immer auf Deutsch, alles erklären, Beispiele geben, Plugins, Commands, GUI, Java-Code wenn nötig.'},
-            {role: 'user', content: question}
-          ],
-          temperature: 0.5
-        })
-      });
+    const answer = `[Dummy-Antwort] Ich kann auf deine Frage antworten: "${question}". Ich erkläre alles rund um Minecraft Plugins, Commands, GUI und Java.`;
 
-      const data = await res.json();
-      const answer = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : 'Keine Antwort erhalten.';
+    this.outputEl.innerText += `\n[Antwort]\n${answer}`;
 
-      this.outputEl.innerText += `\n[Antwort]\n${answer}`;
-      chats[currentChat].push(`> ${question}`);
-      chats[currentChat].push(answer);
-      inputEl.value = '';
+    chats[currentChat].push(`> ${question}`);
+    chats[currentChat].push(answer);
 
-    } catch (err) {
-      this.outputEl.innerText += `\n[Fehler] KI konnte nicht antworten: ${err}`;
-    }
+    inputEl.value='';
   }
 }
 
 const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
 
-function createChat() {
-  const name = 'StandardChat';
-  if (!chats[name]) chats[name] = [];
+function createChat(){
+  const name = document.getElementById('newChatName').value.trim() || 'StandardChat';
+  if(!chats[name]) chats[name] = [];
   currentChat = name;
-  document.getElementById('chatList').innerHTML = `<button onclick="switchChat('${name}')" class="px-2 py-1 bg-mcgreen text-black rounded">${name}</button>`;
+
+  const chatListEl = document.getElementById('chatList');
+  chatListEl.innerHTML='';
+  for(const chatName in chats){
+    chatListEl.innerHTML += `<button onclick="switchChat('${chatName}')" class='px-2 py-1 bg-mcgreen text-black rounded'>${chatName}</button>`;
+  }
+
   mcAIInstance.outputEl.innerText = '';
 }
-function switchChat(name) { currentChat = name; mcAIInstance.outputEl.innerText = chats[name].join('\n'); }
-function askMC_AI() { mcAIInstance.respondGPT(document.getElementById('mcAIInput')); }
-function askPreset(question) { if (!currentChat) createChat(); document.getElementById('mcAIInput').value = question; askMC_AI(); }
-function openMC_AI() { document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value = ''; document.getElementById('mcAIOutput').innerText = ''; }
-function closeMC_AI() { document.getElementById('mcAI').classList.add('hidden'); }
+
+function switchChat(name){
+  currentChat = name;
+  mcAIInstance.outputEl.innerText = chats[name].join('\n');
+}
+
+function askMC_AI(){
+  mcAIInstance.respondDummy(document.getElementById('mcAIInput'));
+}
+
+function askPreset(question){
+  if(!currentChat) createChat();
+  document.getElementById('mcAIInput').value = question;
+  askMC_AI();
+}
+
+function openMC_AI(){
+  document.getElementById('mcAI').classList.remove('hidden');
+  document.getElementById('mcAIInput').value='';
+  document.getElementById('mcAIOutput').innerText='';
+}
+
+function closeMC_AI(){
+  document.getElementById('mcAI').classList.add('hidden');
+}
 </script>
 
 </body>
