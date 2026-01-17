@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Komplettes Coding</title>
+<title>Minecraft Plugin Academy - Vollständige Coding KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -13,14 +13,14 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 
 <header class="bg-black/60 backdrop-blur sticky top-0 z-50">
   <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy - Vollständiges Coding</h1>
+    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy</h1>
     <button onclick="openMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded">Coding KI</button>
   </div>
 </header>
 
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Lerne alles über Minecraft Plugins und Java Programmierung</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Klicke auf ein Kapitel, um alles darüber zu lernen, inklusive Übersetzungen, Erklärungen, Methoden, Events und Beispielcode.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Lerne alles über Minecraft Plugins & Java</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Klicke auf ein Kapitel, um alles darüber zu lernen. Nutze die Coding-KI, um komplette Plugins zu erstellen.</p>
 </section>
 
 <main class="max-w-7xl mx-auto px-6 pb-20">
@@ -42,7 +42,7 @@ tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f1
 <div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 p-6">
   <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white">Schließen</button>
   <h2 class="text-3xl font-bold mb-4 text-mcgreen">Minecraft Coding KI-Assistent</h2>
-  <textarea id="mcAIInput" placeholder="Frag mich alles über Minecraft Plugins oder Programmieren..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
+  <textarea id="mcAIInput" placeholder="Frag mich alles über Minecraft Plugins oder Java..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
   <button onclick="askMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded mb-4">Frage stellen</button>
   <pre id="mcAIOutput" class="bg-black/80 p-4 rounded text-yellow-400 max-w-xl w-full h-64 overflow-auto"></pre>
 </div>
@@ -106,27 +106,57 @@ function closeChapter(){document.getElementById('chapterPage').classList.add('hi
 // =================== Minecraft Coding KI ===================
 class MinecraftCodingAI{
   constructor(outputEl){
-    this.outputEl=outputEl;
-    this.knowledge={
-      'onenable':'onEnable(): Wird ausgeführt beim Plugin Start.\nBeispiel: @Override public void onEnable() { getLogger().info("Plugin gestartet"); }',
-      'ondisable':'onDisable(): Wird beim Plugin Stop ausgeführt.\nBeispiel: @Override public void onDisable() { getLogger().info("Plugin gestoppt"); }',
-      'playerjoinevent':'PlayerJoinEvent: Spieler betritt Server. Beispiel: @EventHandler public void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }',
-      'command':'Commands: Implementiere CommandExecutor, registriere in plugin.yml. Beispiel: public boolean onCommand(CommandSender s, Command c, String l, String[] args){ s.sendMessage("Befehl ausgeführt"); return true; }',
-      'listener':'Listener: Damit dein Plugin Events hören kann. Beispiel: public class MyPlugin extends JavaPlugin implements Listener { @EventHandler public void onJoin(PlayerJoinEvent e){}}',
-      'event':'Events: Reagiere auf PlayerJoinEvent, BlockBreakEvent etc. Mit @EventHandler Methoden definieren.',
+    this.outputEl = outputEl;
+    this.knowledge = {
+      'onenable':'onEnable(): Wird ausgeführt beim Plugin Start.',
+      'ondisable':'onDisable(): Wird beim Plugin Stop ausgeführt.',
+      'playerjoinevent':'PlayerJoinEvent: Spieler betritt Server.',
+      'command':'Commands: Implementiere CommandExecutor, registriere in plugin.yml.',
+      'listener':'Listener: Damit dein Plugin Events hören kann.',
+      'event':'Events: Reagiere auf PlayerJoinEvent, BlockBreakEvent etc.',
       'plugin':'Plugin Struktur: Hauptklasse extends JavaPlugin, plugin.yml, onEnable, onDisable, Listener registrieren',
-      'java':'Java Basics: Variablen, Schleifen, Methoden, Klassen, Objekte, OOP-Konzepte'
+      'java':'Java Basics: Variablen, Schleifen, Methoden, Klassen, OOP-Konzepte'
     };
   }
+
+  // Generiert Code für Plugins auf Anfrage
   answer(question){
-    question=question.toLowerCase();
-    for(let key in this.knowledge){ if(question.includes(key)) return this.knowledge[key]; }
-    return "Sorry, dazu habe ich aktuell keine fertige Antwort. Versuche eine spezifische Methode oder Event zu fragen.";
+    question = question.toLowerCase();
+    if(question.includes('heal')){
+      return `// Fertiges /heal Plugin
+package com.deinplugin;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+public class HealPlugin extends JavaPlugin {
+  @Override
+  public void onEnable(){getLogger().info("Heal Plugin aktiviert");}
+  @Override
+  public void onDisable(){getLogger().info("Heal Plugin deaktiviert");}
+  @Override
+  public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+    if(command.getName().equalsIgnoreCase("heal") && sender instanceof Player){
+      Player player = (Player)sender;
+      player.setHealth(player.getMaxHealth());
+      player.sendMessage("Du wurdest geheilt!");
+      return true;
+    }
+    return false;
   }
-  respond(inputEl){ this.outputEl.innerText=this.answer(inputEl.value); }
+}`;
+    }
+    // Prüfe Wissensbasis
+    for(let key in this.knowledge){
+      if(question.includes(key)) return this.knowledge[key];
+    }
+    return "Sorry, ich kann aktuell keine fertige Antwort generieren. Versuche eine Methode, Event oder Plugin-Funktion zu fragen.";
+  }
+
+  respond(inputEl){ this.outputEl.innerText = this.answer(inputEl.value); }
 }
 
-const mcAIInstance=new MinecraftCodingAI(document.getElementById('mcAIOutput'));
+const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
 function openMC_AI(){ document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value=''; document.getElementById('mcAIOutput').innerText=''; }
 function closeMC_AI(){ document.getElementById('mcAI').classList.add('hidden'); }
 function askMC_AI(){ mcAIInstance.respond(document.getElementById('mcAIInput')); }
