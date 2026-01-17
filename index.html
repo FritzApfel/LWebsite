@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Minecraft Plugin Academy - Komplettes Coding</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  tailwind.config = { theme: { extend: { colors: { mcgreen: '#22c55e', mcdark: '#0f172a' } } } };
+tailwind.config = { theme: { extend: { colors: { mcgreen:'#22c55e', mcdark:'#0f172a' } } } };
 </script>
 </head>
 <body class="bg-gradient-to-br from-mcdark to-black text-gray-100 min-h-screen">
 
 <header class="bg-black/60 backdrop-blur sticky top-0 z-50">
   <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy - Komplettes Coding</h1>
+    <h1 class="text-2xl font-extrabold text-mcgreen">⛏ Minecraft Plugin Academy - Vollständiges Coding</h1>
+    <button onclick="openMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded">Coding KI</button>
   </div>
 </header>
 
 <section class="text-center py-16">
-  <h2 class="text-4xl font-extrabold mb-4">Alles über Programmieren lernen</h2>
-  <p class="text-gray-400 max-w-xl mx-auto">Vom Anfänger bis Profi: Alle Konzepte, Methoden, Strukturen und Minecraft-spezifische Funktionen erklärt. Klick auf ein Kapitel, um es zu öffnen.</p>
+  <h2 class="text-4xl font-extrabold mb-4">Lerne alles über Minecraft Plugins und Java Programmierung</h2>
+  <p class="text-gray-400 max-w-xl mx-auto">Klicke auf ein Kapitel, um alles darüber zu lernen, inklusive Übersetzungen, Erklärungen, Methoden, Events und Beispielcode.</p>
 </section>
 
 <main class="max-w-7xl mx-auto px-6 pb-20">
   <div id="chapterList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </main>
 
+<!-- Kapitel Overlay -->
 <div id="chapterPage" class="hidden fixed inset-0 bg-black/90 overflow-auto p-10 z-50">
   <button onclick="closeChapter()" class="mb-6 px-4 py-2 bg-red-600 rounded text-white">Zurück</button>
   <div class="bg-mcdark p-6 rounded-lg max-w-4xl mx-auto">
@@ -35,99 +37,51 @@
     <div id="methodsList" class="space-y-3"></div>
   </div>
 </div>
-<!-- Minecraft Coding KI Assistant -->
+
+<!-- Minecraft Coding KI -->
 <div id="mcAI" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 p-6">
   <button onclick="closeMC_AI()" class="mb-4 px-4 py-2 bg-red-600 rounded text-white">Schließen</button>
-  <h2 class="text-3xl font-bold mb-4 text-mcgreen">Minecraft Plugin KI-Assistent</h2>
-  <textarea id="mcAIInput" placeholder="Frag mich etwas über Minecraft Plugins..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
+  <h2 class="text-3xl font-bold mb-4 text-mcgreen">Minecraft Coding KI-Assistent</h2>
+  <textarea id="mcAIInput" placeholder="Frag mich alles über Minecraft Plugins oder Programmieren..." class="w-full max-w-xl h-24 p-3 rounded bg-black/80 text-green-300 mb-3"></textarea>
   <button onclick="askMC_AI()" class="px-4 py-2 bg-mcgreen text-black font-bold rounded mb-4">Frage stellen</button>
   <pre id="mcAIOutput" class="bg-black/80 p-4 rounded text-yellow-400 max-w-xl w-full h-64 overflow-auto"></pre>
 </div>
 
 <script>
-// =================== MC Plugin KI CLASS ===================
-class MinecraftCodingAI {
-  constructor(outputEl) {
-    this.outputEl = outputEl;
-    // Vordefinierte Wissensdatenbank
-    this.knowledge = {
-      'onenable': `onEnable(): Wird aufgerufen, wenn dein Plugin startet.\nBeispiel:\n@Override\npublic void onEnable() {\n  getLogger().info("Plugin gestartet");\n}`,
-      'ondisable': `onDisable(): Wird aufgerufen, wenn dein Plugin stoppt.\nBeispiel:\n@Override\npublic void onDisable() {\n  getLogger().info("Plugin gestoppt");\n}`,
-      'playerjoinevent': `PlayerJoinEvent: Wird ausgelöst, wenn ein Spieler den Server betritt.\nBeispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e) {\n  e.getPlayer().sendMessage("Willkommen auf dem Server!");\n}`,
-      'command': `Commands erstellen:\n- Implementiere CommandExecutor\n- Registriere den Befehl in plugin.yml\n- Beispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {\n  sender.sendMessage("Befehl ausgeführt!");\n  return true;\n}`,
-      'listener': `Listener: Damit dein Plugin Events hören kann.\nBeispiel:\npublic class MyPlugin extends JavaPlugin implements Listener {\n  @EventHandler\n  public void onJoin(PlayerJoinEvent e) { /* ... */ }\n}`,
-      'event': `Events: Minecraft-Server sendet Events z.B. PlayerJoinEvent, BlockBreakEvent.\nMithilfe von @EventHandler kannst du darauf reagieren.`,
-      'plugin': `Plugin Struktur:\n- Hauptklasse extends JavaPlugin\n- plugin.yml mit Name, Version, Commands\n- onEnable und onDisable Methoden\n- Event Listener registrieren`
-    };
-  }
-
-  // Methode, die eine Frage beantwortet
-  answer(question) {
-    question = question.toLowerCase();
-    for (let key in this.knowledge) {
-      if (question.includes(key)) {
-        return this.knowledge[key];
-      }
-    }
-    return "Sorry, dazu habe ich aktuell keine fertige Antwort. Versuche spezifische Methoden oder Events zu fragen.";
-  }
-
-  // Ausgabe anzeigen
-  respond(inputEl) {
-    const answer = this.answer(inputEl.value);
-    this.outputEl.innerText = answer;
-  }
-}
-
-// =================== INIT ===================
-const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
-
-// Funktionen zum Öffnen/Schließen Overlay
-function openMC_AI() { document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value=''; document.getElementById('mcAIOutput').innerText=''; }
-function closeMC_AI() { document.getElementById('mcAI').classList.add('hidden'); }
-
-// Frage stellen
-function askMC_AI() { mcAIInstance.respond(document.getElementById('mcAIInput')); }
-</script>
-
-<script>
-// ================= DATEN =================
+// =================== Kapitel Daten ===================
 const chapters = [
-  { id: 'java', title: 'Java Grundlagen', text: 'Alle wichtigen Java Grundlagen: Syntax, Variablen, Schleifen, Bedingungen, Klassen, Objekte, Methoden.', methods: [
-    {name:'System.out.println', desc:'Gibt Text in der Konsole aus.'},
-    {name:'int', desc:'Ganzzahl, speichert Zahlen.'},
-    {name:'String', desc:'Text/Zeichenkette.'},
-    {name:'for-Schleife', desc:'Wiederholt einen Block mehrfach.'},
-    {name:'if/else', desc:'Bedingte Anweisungen.'},
-    {name:'class', desc:'Definiert eine Klasse.'},
-    {name:'new', desc:'Erstellt ein neues Objekt.'},
-    {name:'void', desc:'Funktion gibt nichts zurück.'}
+  { id:'java', title:'Java Grundlagen', text:'Java Basics: Variablen, Schleifen, Bedingungen, Klassen, Methoden.', methods:[
+    {name:'int', desc:'Ganzzahl'},
+    {name:'String', desc:'Text/Zeichenkette'},
+    {name:'for', desc:'Schleife für Wiederholungen'},
+    {name:'if/else', desc:'Bedingungen'},
+    {name:'class', desc:'Definiert Klasse'},
+    {name:'void', desc:'Methode ohne Rückgabewert'}
   ]},
-  { id: 'oop', title: 'Objektorientierte Programmierung', text:'Klassen, Objekte, Vererbung, Interfaces, Polymorphismus alles erklärt mit Beispielen.', methods:[
-    {name:'extends', desc:'Erbt Funktionen und Eigenschaften einer Klasse.'},
-    {name:'implements', desc:'Implementiert ein Interface.'},
-    {name:'super', desc:'Zugriff auf die Elternklasse.'},
-    {name:'this', desc:'Referenz auf das aktuelle Objekt.'}
+  { id:'oop', title:'Objektorientierte Programmierung', text:'Klassen, Objekte, Vererbung, Interfaces, Polymorphismus.', methods:[
+    {name:'extends', desc:'Erbt Funktionen einer Klasse'},
+    {name:'implements', desc:'Implementiert ein Interface'},
+    {name:'this', desc:'Referenz auf aktuelles Objekt'},
+    {name:'super', desc:'Referenz auf Elternklasse'}
   ]},
-  { id:'spigot', title:'Spigot Plugins', text:'Minecraft Plugin Entwicklung: Events, Commands, Listener, Konfigurationen, Player Interaction.', methods:[
-    {name:'onEnable', desc:'Wird ausgeführt, wenn das Plugin startet.'},
-    {name:'onDisable', desc:'Wird ausgeführt, wenn das Plugin stoppt.'},
-    {name:'getLogger', desc:'Logger für die Konsole.'},
-    {name:'PlayerJoinEvent', desc:'Event für Spieler Join.'},
-    {name:'CommandExecutor', desc:'Erstellt Befehle für den Server.'}
+  { id:'spigot', title:'Spigot Plugins', text:'Minecraft Plugin Entwicklung: Events, Commands, Listener, Player Interaction.', methods:[
+    {name:'onEnable', desc:'Wird beim Plugin Start ausgeführt'},
+    {name:'onDisable', desc:'Wird beim Plugin Stop ausgeführt'},
+    {name:'PlayerJoinEvent', desc:'Event, wenn Spieler joinen'},
+    {name:'CommandExecutor', desc:'Erstellt Befehle'}
   ]},
-  { id:'advanced', title:'Fortgeschrittene Konzepte', text:'Threads, Collections, Streams, Lambda, Exception Handling, APIs, Datenbanken, Best Practices.', methods:[
-    {name:'try/catch', desc:'Fehlerbehandlung.'},
-    {name:'ArrayList', desc:'Dynamische Liste.'},
-    {name:'HashMap', desc:'Key-Value Speicher.'},
-    {name:'Lambda', desc:'Kurze Funktionsdefinition.'},
-    {name:'Thread', desc:'Nebenläufige Ausführung.'}
+  { id:'advanced', title:'Fortgeschrittene Konzepte', text:'Threads, Collections, Streams, Lambda, Exception Handling, APIs.', methods:[
+    {name:'try/catch', desc:'Fehlerbehandlung'},
+    {name:'ArrayList', desc:'Dynamische Liste'},
+    {name:'HashMap', desc:'Key-Value Speicher'},
+    {name:'Lambda', desc:'Kurze Funktion'},
+    {name:'Thread', desc:'Nebenläufige Ausführung'}
   ]}
 ];
 
-// ================= UI =================
+// =================== Kapitel UI ===================
 const chapterListEl = document.getElementById('chapterList');
-chapters.forEach(ch => {
+chapters.forEach(ch=>{
   const div = document.createElement('div');
   div.className='bg-white/5 border border-white/10 rounded-xl p-5 hover:border-mcgreen cursor-pointer';
   div.innerHTML=`<h3 class='text-lg font-bold'>${ch.title}</h3>`;
@@ -136,7 +90,7 @@ chapters.forEach(ch => {
 });
 
 function openChapter(id){
-  const ch = chapters.find(c=>c.id===id);
+  const ch=chapters.find(c=>c.id===id);
   if(!ch) return;
   document.getElementById('chapterTitle').innerText=ch.title;
   document.getElementById('chapterText').innerText=ch.text;
@@ -147,10 +101,35 @@ function openChapter(id){
   });
   document.getElementById('chapterPage').classList.remove('hidden');
 }
+function closeChapter(){document.getElementById('chapterPage').classList.add('hidden');}
 
-function closeChapter(){
-  document.getElementById('chapterPage').classList.add('hidden');
+// =================== Minecraft Coding KI ===================
+class MinecraftCodingAI{
+  constructor(outputEl){
+    this.outputEl=outputEl;
+    this.knowledge={
+      'onenable':'onEnable(): Wird ausgeführt beim Plugin Start.\nBeispiel: @Override public void onEnable() { getLogger().info("Plugin gestartet"); }',
+      'ondisable':'onDisable(): Wird beim Plugin Stop ausgeführt.\nBeispiel: @Override public void onDisable() { getLogger().info("Plugin gestoppt"); }',
+      'playerjoinevent':'PlayerJoinEvent: Spieler betritt Server. Beispiel: @EventHandler public void onJoin(PlayerJoinEvent e){ e.getPlayer().sendMessage("Willkommen!"); }',
+      'command':'Commands: Implementiere CommandExecutor, registriere in plugin.yml. Beispiel: public boolean onCommand(CommandSender s, Command c, String l, String[] args){ s.sendMessage("Befehl ausgeführt"); return true; }',
+      'listener':'Listener: Damit dein Plugin Events hören kann. Beispiel: public class MyPlugin extends JavaPlugin implements Listener { @EventHandler public void onJoin(PlayerJoinEvent e){}}',
+      'event':'Events: Reagiere auf PlayerJoinEvent, BlockBreakEvent etc. Mit @EventHandler Methoden definieren.',
+      'plugin':'Plugin Struktur: Hauptklasse extends JavaPlugin, plugin.yml, onEnable, onDisable, Listener registrieren',
+      'java':'Java Basics: Variablen, Schleifen, Methoden, Klassen, Objekte, OOP-Konzepte'
+    };
+  }
+  answer(question){
+    question=question.toLowerCase();
+    for(let key in this.knowledge){ if(question.includes(key)) return this.knowledge[key]; }
+    return "Sorry, dazu habe ich aktuell keine fertige Antwort. Versuche eine spezifische Methode oder Event zu fragen.";
+  }
+  respond(inputEl){ this.outputEl.innerText=this.answer(inputEl.value); }
 }
+
+const mcAIInstance=new MinecraftCodingAI(document.getElementById('mcAIOutput'));
+function openMC_AI(){ document.getElementById('mcAI').classList.remove('hidden'); document.getElementById('mcAIInput').value=''; document.getElementById('mcAIOutput').innerText=''; }
+function closeMC_AI(){ document.getElementById('mcAI').classList.add('hidden'); }
+function askMC_AI(){ mcAIInstance.respond(document.getElementById('mcAIInput')); }
 </script>
 
 </body>
