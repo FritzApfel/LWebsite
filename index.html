@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Apfel KI - Deine lokale Chat-KI</title>
+<title>Fabian KI - Deine lokale Chat-KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -24,7 +24,7 @@ tailwind.config = {
 
 <header class="bg-appleDark/80 backdrop-blur sticky top-0 z-50 shadow-md">
   <div class="max-w-4xl mx-auto flex justify-between items-center p-4">
-    <h1 class="text-2xl font-bold text-appleRed">🍎 Apfel KI</h1>
+    <h1 class="text-2xl font-bold text-appleRed">🍎 Fabian KI</h1>
     <button onclick="toggleChat()" class="px-4 py-2 bg-appleRed text-white font-bold rounded hover:bg-red-600">Chat öffnen</button>
   </div>
 </header>
@@ -32,7 +32,7 @@ tailwind.config = {
 <main class="flex-grow flex items-center justify-center p-6">
   <div class="text-center max-w-xl">
     <h2 class="text-4xl font-extrabold mb-4">Deine lokale Chat-KI</h2>
-    <p class="text-gray-300 mb-6">Stelle der Apfel KI Fragen und erhalte intelligente, realistische Antworten – alles lokal, keine API nötig.</p>
+    <p class="text-gray-300 mb-6">Stelle der Fabian KI Fragen und erhalte intelligente, realistische Antworten – alles lokal, keine API nötig.</p>
     <input id="playerNameInput" type="text" placeholder="Dein Name..." class="px-4 py-2 rounded text-black w-full mb-2"/>
     <button onclick="setPlayerName()" class="px-4 py-2 bg-appleRed text-white font-bold rounded w-full">Start</button>
   </div>
@@ -40,7 +40,7 @@ tailwind.config = {
 
 <div id="chatWindow" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16 overflow-auto">
   <button onclick="toggleChat()" class="absolute top-6 right-6 px-4 py-2 bg-red-600 rounded text-white">Schließen</button>
-  <h2 class="text-3xl font-bold mb-4 text-appleRed">🍎 Apfel KI Chat</h2>
+  <h2 class="text-3xl font-bold mb-4 text-appleRed">🍎 Fabian KI Chat</h2>
 
   <div class="flex gap-2 mb-4">
     <button onclick="askPreset('Hallo')" class="px-3 py-1 bg-appleRed rounded">Hallo</button>
