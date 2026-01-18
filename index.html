@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Plugin Academy - Intelligente Dummy-KI</title>
+<title>Minecraft Plugin Academy - Intelligente KI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -69,42 +69,40 @@ function setPlayerName(){
   alert(`Hallo ${playerName}! Die KI ist bereit.`);
 }
 
-// Dummy KI, reagiert intelligent wie echte KI
 class MinecraftCodingAI {
   constructor(outputEl){ this.outputEl = outputEl; }
 
-  async respondDummy(inputEl){
+  async respondGPT(inputEl){
     const question = inputEl.value.trim();
     if(!question) return;
     if(!currentChat) return alert("Erstelle zuerst einen Chat!");
 
     this.outputEl.innerText += `\n[KI denkt...]`;
 
-    const q = question.toLowerCase();
-    let answer='';
+    try{
+      const res = await fetch('https://api.openai.com/v1/responses', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer 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'
+        },
+        body: JSON.stringify({
+          model:"gpt-5-nano",
+          input: question,
+          store: true
+        })
+      });
 
-    if(/anfang|start|beginnen/.test(q)){
-      answer=`Hallo ${playerName}! Um mit Minecraft Plugins zu starten:\n`+
-             `1. Java Grundlagen lernen\n2. IntelliJ IDEA installieren\n3. Spigot/Paper-Projekt erstellen\n4. Tutorials anschauen\n`+
-             `Beispiel:\npublic class MeinPlugin extends JavaPlugin {\n  @Override\n  public void onEnable() {\n    getLogger().info("Plugin aktiviert!");\n  }\n}`;
-    } else if(/command/.test(q)) {
-      answer=`CommandExecutor Beispiel:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {\n  sender.sendMessage("Befehl ausgeführt!");\n  return true;\n}`;
-    } else if(/event|join/.test(q)) {
-      answer=`PlayerJoinEvent Beispiel:\n@EventHandler\npublic void onJoin(PlayerJoinEvent e) {\n  e.getPlayer().sendMessage("Willkommen auf dem Server!");\n}`;
-    } else if(/gui/.test(q)) {
-      answer=`GUI Beispiel:\nInventory inv = Bukkit.createInventory(player, 9, "Mein GUI");\nplayer.openInventory(inv);`;
-    } else {
-      answer=`[Dummy-KI] Ich habe deine Frage verstanden: "${question}"\n`+
-             `Ich kann dir bei Minecraft Plugins, Java, Commands, Events, GUI und Spigot/Paper helfen.\n`+
-             `Stelle deine Frage genauer für ein Beispiel oder Code-Snippet.`;
+      const data = await res.json();
+      const answer = data.output_text || "Keine Antwort erhalten.";
+
+      this.outputEl.innerText += `\n[Antwort]\n${answer}`;
+      chats[currentChat].push(`> ${question}`);
+      chats[currentChat].push(answer);
+      inputEl.value='';
+    } catch(err){
+      this.outputEl.innerText += `\n[Fehler] KI konnte nicht antworten: ${err}`;
     }
-
-    this.outputEl.innerText += `\n[Antwort]\n${answer}`;
-
-    chats[currentChat].push(`> ${question}`);
-    chats[currentChat].push(answer);
-
-    inputEl.value='';
   }
 }
 
@@ -130,7 +128,7 @@ function switchChat(name){
 }
 
 function askMC_AI(){
-  mcAIInstance.respondDummy(document.getElementById('mcAIInput'));
+  mcAIInstance.respondGPT(document.getElementById('mcAIInput'));
 }
 
 function askPreset(question){
