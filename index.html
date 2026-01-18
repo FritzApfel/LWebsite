@@ -2,19 +2,14 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Fabian KI - Deine lokale Chat-KI</title>
+<title>Apfel KI - Alles-in-einem</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
   theme: {
     extend: {
-      colors: {
-        appleRed: '#ef4444',
-        appleDark: '#1f2937',
-        appleLight: '#f3f4f6',
-        appleGreen: '#22c55e',
-      }
+      colors: { appleRed:'#ef4444', appleDark:'#1f2937', appleLight:'#f3f4f6', appleGreen:'#22c55e' }
     }
   }
 };
@@ -22,209 +17,233 @@ tailwind.config = {
 </head>
 <body class="bg-gradient-to-br from-appleDark to-black text-white min-h-screen flex flex-col">
 
-<header class="bg-appleDark/80 backdrop-blur sticky top-0 z-50 shadow-md">
-  <div class="max-w-4xl mx-auto flex justify-between items-center p-4">
-    <h1 class="text-2xl font-bold text-appleRed">🍎 Fabian KI</h1>
-    <button onclick="toggleChat()" class="px-4 py-2 bg-appleRed text-white font-bold rounded hover:bg-red-600">Chat öffnen</button>
-  </div>
+<header class="bg-appleDark/80 sticky top-0 z-50 p-4 flex justify-between items-center">
+<h1 class="text-2xl font-bold text-appleRed">🍎 Apfel KI</h1>
+<button onclick="toggleChat()" class="px-4 py-2 bg-appleRed rounded">Chat öffnen</button>
 </header>
 
-<main class="flex-grow flex items-center justify-center p-6">
-  <div class="text-center max-w-xl">
-    <h2 class="text-4xl font-extrabold mb-4">Deine lokale Chat-KI</h2>
-    <p class="text-gray-300 mb-6">Stelle der Fabian KI Fragen und erhalte intelligente, realistische Antworten – alles lokal, keine API nötig.</p>
-    <input id="playerNameInput" type="text" placeholder="Dein Name..." class="px-4 py-2 rounded text-black w-full mb-2"/>
-    <button onclick="setPlayerName()" class="px-4 py-2 bg-appleRed text-white font-bold rounded w-full">Start</button>
-  </div>
+<main class="flex-grow flex flex-col items-center justify-center p-6">
+<div class="text-center max-w-xl">
+<h2 class="text-4xl font-extrabold mb-4">Lokale KI – Alles in einem</h2>
+<input id="playerNameInput" type="text" placeholder="Dein Name..." class="px-4 py-2 rounded text-black w-full mb-2"/>
+<button onclick="setPlayerName()" class="px-4 py-2 bg-appleRed rounded w-full">Start</button>
+</div>
 </main>
 
 <div id="chatWindow" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-start z-50 p-6 pt-16 overflow-auto">
-  <button onclick="toggleChat()" class="absolute top-6 right-6 px-4 py-2 bg-red-600 rounded text-white">Schließen</button>
-  <h2 class="text-3xl font-bold mb-4 text-appleRed">🍎 Fabian KI Chat</h2>
+<button onclick="toggleChat()" class="absolute top-6 right-6 px-4 py-2 bg-red-600 rounded">Schließen</button>
+<h2 class="text-3xl font-bold mb-4 text-appleRed">🍎 Apfel KI Chat</h2>
 
-  <div class="flex gap-2 mb-4">
-    <button onclick="askPreset('Hallo')" class="px-3 py-1 bg-appleRed rounded">Hallo</button>
-    <button onclick="askPreset('Wie geht es dir?')" class="px-3 py-1 bg-appleRed rounded">Wie geht es dir?</button>
-  </div>
+<textarea id="chatInput" placeholder="Frage..." class="w-full max-w-xl h-24 p-3 rounded bg-appleDark/80 mb-3"></textarea>
+<button onclick="askAI()" class="px-4 py-2 bg-appleRed rounded mb-4 w-full max-w-xl">Frage stellen</button>
 
-  <div class="mb-4 flex items-center gap-2 w-full max-w-xl">
-    <input id="newChatName" placeholder="Neuen Chatnamen eingeben..." class="flex-grow px-3 py-1 rounded text-black"/>
-    <button onclick="createChat()" class="px-3 py-1 bg-appleRed rounded text-white">Chat erstellen</button>
-  </div>
-
-  <div id="chatList" class="flex gap-2 mb-4 overflow-x-auto"></div>
-
-  <textarea id="chatInput" placeholder="Schreibe deine Frage..." class="w-full max-w-xl h-24 p-3 rounded bg-appleDark/80 mb-3"></textarea>
-  <button onclick="askAI()" class="px-4 py-2 bg-appleRed text-white font-bold rounded mb-4 w-full max-w-xl">Frage stellen</button>
-
-  <pre id="chatOutput" class="bg-appleDark/80 p-4 rounded text-white max-w-xl w-full h-96 overflow-auto"></pre>
+<pre id="chatOutput" class="bg-appleDark/80 p-4 rounded text-white max-w-xl w-full h-96 overflow-auto"></pre>
 </div>
 
 <script>
-let playerName = 'Spieler';
-let chats = {};
-let currentChat = null;
+let playerName='Spieler';
+let chats={};
+let currentChat=null;
 
-function setPlayerName() {
-  const input = document.getElementById('playerNameInput').value.trim();
-  if(input) playerName = input;
-  document.getElementById('playerNameInput').parentElement.style.display = 'none';
-  alert(`Hallo ${playerName}! Die Apfel KI ist bereit. (Programmiert von Fabian D.)`);
+// Nutzername setzen
+function setPlayerName(){
+  const input=document.getElementById('playerNameInput').value.trim();
+  if(input) playerName=input;
+  document.getElementById('playerNameInput').parentElement.style.display='none';
+  alert(`Hallo ${playerName}! Die Apfel KI ist bereit. Entwickelt von Fabian D.`);
 }
 
-// Große KI Logik
-class RealisticLogicAI {
+// Alles-in-einem Knowledge Array
+const knowledge = [
+  {keywords:['hallo','hi','hey'], responses:['Hallo!','Hi, wie gehts?','Hey! Schön dich zu sehen!']},
+  {keywords:['wie geht es dir'], responses:['Mir geht es gut, danke!','Alles bestens hier!','Super, danke der Nachfrage.']},
+  {keywords:['zeit','uhr'], responses:[`Es ist gerade ${new Date().toLocaleTimeString()}`,'Schau auf deine Uhr!']},
+  {keywords:['programmieren','code','coding'], responses:['Ich kann dir beim Coden helfen!','Willst du ein Beispiel in JS, Python oder Java?']},
+  {keywords:['minecraft','plugin'], responses:['Ich kann Minecraft Plugins erklären oder schreiben!','Möchtest du ein Beispiel Plugin sehen?']},
+  {keywords:['hilfe','frage'], responses:['Klar, frag mich alles!','Ich helfe dir gerne!']},
+  {keywords:['rechnen','math','berechne'], responses:['Gib mir bitte die Aufgabe.','Ich kann einfache Berechnungen lösen.']},
+  {keywords:['joke','witz'], responses:['Warum hat der Programmierer die Straße überquert? Um zur nächsten Schleife zu gelangen!','Ich habe einen lustigen Witz, willst du ihn hören?']},
+    { keywords: ['hallo','hi','hey','guten tag','servus'], responses: ['Hallo!','Hi, schön dich zu sehen!','Hey, wie geht es dir?','Servus!'] },
+  { keywords: ['wie geht es dir','wie läufts'], responses: ['Mir geht es gut, danke!','Alles bestens hier!','Super, danke der Nachfrage.'] },
+
+  // Zeit & Datum
+  { keywords: ['zeit','uhr','wie spät'], responses: [`Es ist gerade ${new Date().toLocaleTimeString()}`, 'Schau auf deine Uhr!'] },
+  { keywords: ['datum','welches datum'], responses: [`Heute ist der ${new Date().toLocaleDateString()}`,'Du kannst das Datum auf deinem Kalender sehen.'] },
+
+  // Mathematik
+  { keywords: ['rechnen','berechne','mathe','addiere','subtrahiere','multipliziere','dividiere'], responses: ['Gib mir bitte die Aufgabe, ich löse sie.','Ich kann einfache mathematische Aufgaben lösen.'] },
+
+  // Allgemeines Wissen
+  { keywords: ['universum','raum','planeten'], responses: ['Das Universum ist riesig und voller Geheimnisse.','Wusstest du, dass es Milliarden von Galaxien gibt?'] },
+  { keywords: ['erde','welt','kontinente'], responses: ['Die Erde hat 7 Kontinente und 5 Ozeane.','Wusstest du, dass der größte Ozean der Pazifik ist?'] },
+  { keywords: ['tiere','tier','katze','hund'], responses: ['Tiere sind faszinierend!','Katzen sind unabhängig, Hunde loyal.'] },
+  { keywords: ['pflanzen','baum','blume'], responses: ['Bäume produzieren Sauerstoff, wichtig für das Leben.','Blumen haben oft symbolische Bedeutungen.'] },
+
+  // Technologie
+  { keywords: ['computer','pc','hardware'], responses: ['Computer bestehen aus CPU, RAM, Motherboard, etc.','Hast du Fragen zu Programmierung oder Hardware?'] },
+  { keywords: ['internet','netzwerk','wifi'], responses: ['Das Internet verbindet die ganze Welt.','WLAN ist eine drahtlose Netzwerkverbindung.'] },
+  { keywords: ['programmieren','code','software','entwicklung'], responses: ['Ich kann dir bei Programmiersprachen helfen!','Möchtest du ein Beispiel in JavaScript, Python oder Java?'] },
+
+  // KI & Robotik
+  { keywords: ['künstliche intelligenz','ki','robotik'], responses: ['KI kann Muster erkennen und Aufgaben automatisieren.','Robotik kombiniert Hardware und Software für autonome Maschinen.'] },
+  { keywords: ['machine learning','lernen','neuronales netzwerk'], responses: ['Machine Learning nutzt Daten, um Modelle zu trainieren.','Neuronale Netzwerke sind inspiriert vom menschlichen Gehirn.'] },
+
+  // Unterhaltung
+  { keywords: ['musik','song','lied'], responses: ['Musik kann die Stimmung heben.','Welches Genre magst du am liebsten?'] },
+  { keywords: ['film','kino','serie'], responses: ['Filme sind tolle Geschichten in Bildern.','Hast du einen Lieblingsfilm?'] },
+  { keywords: ['spiel','spiele','gaming'], responses: ['Videospiele können strategisch oder kreativ sein.','Was spielst du am liebsten?'] },
+
+  // Witze & Humor
+  { keywords: ['witz','joke','humor'], responses: ['Warum hat der Programmierer die Straße überquert? Um zur nächsten Schleife zu gelangen!','Ich habe einen lustigen Witz, willst du ihn hören?'] },
+
+  // Wissenschaft
+  { keywords: ['physik','chemie','biologie'], responses: ['Physik erklärt Naturgesetze, Chemie Stoffe, Biologie Lebewesen.','Wissenschaft ist spannend und vielfältig!'] },
+  { keywords: ['mathematik','algebra','geometrie'], responses: ['Mathematik hilft uns, die Welt zu verstehen.','Algebra und Geometrie sind fundamentale Zweige.'] },
+
+  // Minecraft
+  { keywords: ['minecraft','plugin','bukkit','spigot'], responses: ['Ich kann Minecraft Plugins erklären oder schreiben!','Willst du ein Beispiel Plugin sehen?'] },
+  { keywords: ['command','event','gui'], responses: ['Commands steuern Plugins, Events reagieren auf Aktionen, GUIs zeigen Interfaces.'] },
+
+  // Persönliches
+  { keywords: ['wer bist du','name','wer programmiert'], responses: ['Ich bin die Apfel KI, programmiert von Fabian D.','Ich wurde entwickelt, um Fragen zu beantworten und Wissen zu teilen.'] },
+  { keywords: ['hilfe','frage','support'], responses: ['Klar, frag mich alles!','Ich helfe dir gerne weiter.'] },
+
+  // Random Antworten (Fallback)
+  { keywords: [], responses: ['Interessant, erzähl mir mehr.','Kannst du das genauer erklären?','Hmmm… darüber habe ich noch nicht nachgedacht.','Spannend, erzähl mir mehr!','Ich verstehe, weiter…'] }
+
+  { keywords: ['programmieren','code','lernen programmieren','programmiersprache'], 
+    responses: [
+      'Programmiersprachen sind Werkzeuge, um dem Computer Aufgaben zu geben. Beispiele: Python, Java, JavaScript, C++.',
+      'Um programmieren zu lernen, beginne mit den Grundlagen wie Variablen, Schleifen und Funktionen.',
+      'Ein guter Start ist es, kleine Projekte zu bauen und nach und nach komplexere Strukturen zu verstehen.'
+    ] 
+  },
+
+  // Java
+  { keywords: ['java','javacode','java plugin','java fehler'], 
+    responses: [
+      'Java ist eine objektorientierte Sprache. Klassen, Objekte, Vererbung sind zentrale Konzepte.',
+      'Ein häufiger Fehler in Java ist die NullPointerException, wenn man auf ein nicht initialisiertes Objekt zugreift.',
+      'Java Plugins für Minecraft sollten die Methoden onEnable() und onDisable() korrekt überschreiben, sonst starten sie nicht.'
+    ] 
+  },
+
+  // Python
+  { keywords: ['python','python code','python fehler','python lernen'], 
+    responses: [
+      'Python ist eine einfach zu lernende Sprache, ideal für Einsteiger.',
+      'IndentationError entsteht, wenn die Einrückungen im Code nicht korrekt sind.',
+      'Du kannst Funktionen definieren mit def meineFunktion(): und Variablen dynamisch zuweisen.'
+    ] 
+  },
+
+  // JavaScript
+  { keywords: ['javascript','js','nodejs','js fehler','browser code'], 
+    responses: [
+      'In JavaScript entstehen oft ReferenceErrors, wenn Variablen vor ihrer Definition genutzt werden.',
+      'TypeErrors treten auf, wenn man eine Funktion oder Methode auf einen falschen Datentyp anwendet.',
+      'Node.js erlaubt serverseitiges JavaScript. Achte auf async/await bei asynchronen Operationen.'
+    ] 
+  },
+
+  // C++
+  { keywords: ['c++','cpp','c++ fehler','memory leak'], 
+    responses: [
+      'C++ erfordert explizite Speicherverwaltung. Ein Memory Leak entsteht, wenn Speicher reserviert aber nicht freigegeben wird.',
+      'Segmentation Faults treten auf, wenn man auf ungültige Speicheradressen zugreift.',
+      'Nutze Header-Dateien und passende Includes, um Code sauber zu strukturieren.'
+    ] 
+  },
+
+  // Fehler erkennen allgemein
+  { keywords: ['error','fehler','bug','debug'], 
+    responses: [
+      'Um Fehler zu erkennen, lies die Fehlermeldung genau und prüfe, auf welche Zeile sie sich bezieht.',
+      'Debugging-Tools helfen dir, Variablenwerte Schritt für Schritt zu prüfen.',
+      'Kommentare und sauberes Strukturieren des Codes erleichtern das Finden von Bugs.'
+    ] 
+  },
+
+  // HTML / CSS
+  { keywords: ['html','css','web design','website','frontend'], 
+    responses: [
+      'In HTML beschreibt man die Struktur einer Webseite mit Tags wie <div>, <p>, <a>.',
+      'CSS steuert das Aussehen: Farben, Layouts, Schriftarten und Animationen.',
+      'Ein häufiger Fehler ist vergessenes Schließen von Tags oder falsche Selektoren.'
+    ] 
+  },
+
+  // Debugging Beispiele
+  { keywords: ['syntaxfehler','compile error','runtime error'], 
+    responses: [
+      'Syntaxfehler: Dein Code verstößt gegen die Regeln der Sprache, z.B. fehlt ein Semikolon.',
+      'Compile Error: Der Compiler konnte deinen Code nicht übersetzen. Prüfe Variablen, Typen und Bibliotheken.',
+      'Runtime Error: Der Code wird beim Ausführen abgebrochen, z.B. Division durch Null oder Zugriff auf null.'
+    ] 
+  },
+
+  // Tipps für Anfänger
+  { keywords: ['anfänger','lernen','tutorial','code beispiel'], 
+    responses: [
+      'Beginne klein: Schreibe einfache Programme, z.B. ein Taschenrechner oder eine ToDo-Liste.',
+      'Nutze Online-Ressourcen wie Tutorials, Dokumentationen und Coding-Plattformen.',
+      'Fehler sind normal: Jede Fehlermeldung ist eine Chance zu lernen.'
+    ] 
+  }
+];
+
+
+const defaultResponses=[
+  'Interessant, erzähl mir mehr.',
+  'Kannst du das genauer erklären?',
+  'Hmmm… darüber habe ich noch nicht nachgedacht.',
+  'Spannend, erzähl mir mehr!',
+  'Ich verstehe, weiter…'
+];
+
+class AllInOneAI{
   constructor(outputEl){
-    this.outputEl = outputEl;
-    this.memory = [];
-
-    this.knowledge = [
-      // Smalltalk
-      { keywords: ['hallo','hi','hey'], responses: ['Hallo!', 'Hi, wie geht es dir?', 'Hey, schön dich zu sehen!'] },
-      { keywords: ['wie geht es dir','wie läufts'], responses: ['Mir geht es gut, danke!', 'Alles bestens hier!', 'Super, danke der Nachfrage.'] },
-      { keywords: ['tschüss','bye','auf wiedersehen'], responses: ['Tschüss! Bis bald!', 'Auf Wiedersehen!', 'Mach’s gut!'] },
-
-      // Zeit
-      { keywords: ['zeit','uhr'], responses: [`Die aktuelle Uhrzeit ist ${new Date().toLocaleTimeString()}`, 'Schau mal auf deine Uhr!'] },
-
-      // Mathematik
-      { keywords: ['rechnen','berechne','math','summe','minus','mal','geteilt'], responses: [
-        'Gib mir bitte die mathematische Aufgabe, dann löse ich sie.',
-        'Ich kann einfache Rechnungen ausführen. Zum Beispiel: 2+2=4'
-      ]},
-
-      // Programmieren
-      { keywords: ['programmieren','code','javascript','java','python','c++'], responses: [
-        'Ich kann dir erklären, wie man in verschiedenen Sprachen programmiert!',
-        'Beispiel JavaScript: console.log("Hallo Welt");',
-        'Beispiel Python: print("Hallo Welt")',
-        'Beispiel Java: System.out.println("Hallo Welt");'
-      ]},
-
-      // Minecraft
-      { keywords: ['minecraft','plugin','spigot','bukkit'], responses: [
-        'Für Minecraft Plugins empfehle ich Spigot oder Paper. Du kannst Events, Commands und GUI programmieren.',
-        'Beispiel CommandExecutor:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {\n sender.sendMessage("Befehl ausgeführt!"); return true;\n}'
-      ]},
-
-      // Allgemeinwissen
-      { keywords: ['erkläre','was ist','definiere','wer ist'], responses: [
-        'Hier ist eine kurze Erklärung:',
-        'Ich kann dir darüber Informationen geben.',
-        'Faszinierend! Lass mich erklären:'
-      ]},
-
-      // Wissenschaft
-      { keywords: ['physik','chemie','mathematik','astronomie','biologie'], responses: [
-        'In diesem Bereich kann ich dir fundiertes Wissen liefern.',
-        'Wissenschaftliche Fakten:'
-      ]},
-
-      // Geschichte
-      { keywords: ['geschichte','weltkrieg','römisch','mittelalter'], responses: [
-        'Lass uns über Geschichte sprechen!',
-        'Wichtige historische Fakten:'
-      ]},
-
-      // Raumfahrt
-      { keywords: ['raumfahrt','planet','sonne','mond','mars'], responses: [
-        'Die Raumfahrt ist spannend! Wusstest du, dass der Mars rote Farbe durch Eisenoxid hat?',
-        'Astronomische Fakten:'
-      ]},
-
-      // Humor
-      { keywords: ['witz','scherz','funny'], responses: [
-        'Haha, das ist lustig!',
-        'Ich liebe Humor! 😄',
-        'Guter Witz!'
-      ]},
-
-      // Tiere
-      { keywords: ['hund','katze','tier','vogel'], responses: [
-        'Tiere sind faszinierend. Wusstest du, dass Katzen bis zu 20 Jahre alt werden können?',
-        'Tiere bringen Freude ins Leben!'
-      ]}
-    ];
-
-    this.defaultResponses = [
-      'Interessant, erzähl mir mehr.',
-      'Kannst du das genauer erklären?',
-      'Hmmm… darüber habe ich noch nicht nachgedacht.',
-      'Spannend, erzähl mir mehr!',
-      'Ich verstehe, weiter…',
-      'Faszinierend! Erzähle mir mehr, ich lerne ständig dazu.',
-      'Ich bin programmiert von Fabian D., um alles Mögliche zu beantworten.'
-    ];
+    this.outputEl=outputEl;
   }
 
   respond(inputEl){
-    const question = inputEl.value.trim();
-    if(!question || !currentChat) return;
-    this.outputEl.innerText += `\n[KI denkt...]`;
+    const question=inputEl.value.trim();
+    if(!question) return;
+    if(!currentChat) currentChat='Standard';
+    if(!chats[currentChat]) chats[currentChat]=[];
 
-    let answer = '';
-    const lowerQ = question.toLowerCase();
+    this.outputEl.innerText+=`\n[KI denkt...]`;
 
-    // Prüfe die Knowledgebase
-    for(const item of this.knowledge){
-      if(item.keywords.some(k => lowerQ.includes(k))){
-        answer = item.responses[Math.floor(Math.random() * item.responses.length)];
+    const lowerQ=question.toLowerCase();
+    let answer='';
+
+    for(const k of knowledge){
+      if(k.keywords.some(kw=>lowerQ.includes(kw))){
+        answer=k.responses[Math.floor(Math.random()*k.responses.length)];
         break;
       }
     }
-
-    // Zufallsantwort, wenn keine Keywords passen
     if(!answer){
-      answer = this.defaultResponses[Math.floor(Math.random() * this.defaultResponses.length)];
+      answer=defaultResponses[Math.floor(Math.random()*defaultResponses.length)];
     }
 
-    // Memory speichern
-    this.memory.push({question, answer});
-    this.outputEl.innerText += `\n[Antwort]\n${answer}`;
-
-    // Chat speichern
+    this.outputEl.innerText+=`\n[Antwort]\n${answer}`;
     chats[currentChat].push(`> ${question}`);
     chats[currentChat].push(answer);
 
-    inputEl.value = '';
+    inputEl.value='';
   }
 }
 
-const ai = new RealisticLogicAI(document.getElementById('chatOutput'));
-
-function createChat(){
-  const name = document.getElementById('newChatName').value.trim() || 'StandardChat';
-  if(!chats[name]) chats[name] = [];
-  currentChat = name;
-
-  const chatListEl = document.getElementById('chatList');
-  chatListEl.innerHTML = '';
-  for(const chatName in chats){
-    chatListEl.innerHTML += `<button onclick="switchChat('${chatName}')" class="px-2 py-1 bg-appleRed rounded">${chatName}</button>`;
-  }
-
-  ai.outputEl.innerText = '';
-}
-
-function switchChat(name){
-  currentChat = name;
-  ai.outputEl.innerText = chats[name].join('\n');
-}
+const ai=new AllInOneAI(document.getElementById('chatOutput'));
 
 function askAI(){
   ai.respond(document.getElementById('chatInput'));
-}
-
-function askPreset(text){
-  if(!currentChat) createChat();
-  document.getElementById('chatInput').value = text;
-  askAI();
 }
 
 function toggleChat(){
   document.getElementById('chatWindow').classList.toggle('hidden');
 }
 </script>
-
 </body>
 </html>
