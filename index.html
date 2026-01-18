@@ -70,83 +70,35 @@ function setPlayerName(){
 }
 
 class MinecraftCodingAI {
-  constructor(outputEl){ this.outputEl = outputEl; }
+  constructor(outputEl) { this.outputEl = outputEl; }
 
-  async respondGPT(inputEl){
+  async respondGPT(inputEl) {
     const question = inputEl.value.trim();
-    if(!question) return;
-    if(!currentChat) return alert("Erstelle zuerst einen Chat!");
+    if (!question) return;
+    if (!currentChat) return alert("Erstelle zuerst einen Chat!");
 
     this.outputEl.innerText += `\n[KI denkt...]`;
 
-    try{
-      const res = await fetch('https://api.openai.com/v1/responses', {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer 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'
-        },
-        body: JSON.stringify({
-          model:"gpt-5-nano",
-          input: question,
-          store: true
-        })
+    try {
+      const res = await fetch("http://localhost:3000/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
       });
 
       const data = await res.json();
-      const answer = data.output_text || "Keine Antwort erhalten.";
+      const answer = data.answer || "Keine Antwort erhalten.";
 
       this.outputEl.innerText += `\n[Antwort]\n${answer}`;
+
+      // Chat speichern
       chats[currentChat].push(`> ${question}`);
       chats[currentChat].push(answer);
-      inputEl.value='';
-    } catch(err){
+
+      inputEl.value = '';
+    } catch (err) {
       this.outputEl.innerText += `\n[Fehler] KI konnte nicht antworten: ${err}`;
     }
   }
 }
 
-const mcAIInstance = new MinecraftCodingAI(document.getElementById('mcAIOutput'));
-
-function createChat(){
-  const name = document.getElementById('newChatName').value.trim() || 'StandardChat';
-  if(!chats[name]) chats[name]=[];
-  currentChat=name;
-
-  const chatListEl=document.getElementById('chatList');
-  chatListEl.innerHTML='';
-  for(const chatName in chats){
-    chatListEl.innerHTML += `<button onclick="switchChat('${chatName}')" class='px-2 py-1 bg-mcgreen text-black rounded'>${chatName}</button>`;
-  }
-
-  mcAIInstance.outputEl.innerText='';
-}
-
-function switchChat(name){
-  currentChat=name;
-  mcAIInstance.outputEl.innerText=chats[name].join('\n');
-}
-
-function askMC_AI(){
-  mcAIInstance.respondGPT(document.getElementById('mcAIInput'));
-}
-
-function askPreset(question){
-  if(!currentChat) createChat();
-  document.getElementById('mcAIInput').value=question;
-  askMC_AI();
-}
-
-function openMC_AI(){
-  document.getElementById('mcAI').classList.remove('hidden');
-  document.getElementById('mcAIInput').value='';
-  document.getElementById('mcAIOutput').innerText='';
-}
-
-function closeMC_AI(){
-  document.getElementById('mcAI').classList.add('hidden');
-}
-</script>
-
-</body>
-</html>
