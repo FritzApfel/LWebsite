@@ -69,29 +69,95 @@ function setPlayerName() {
   const input = document.getElementById('playerNameInput').value.trim();
   if(input) playerName = input;
   document.getElementById('playerNameInput').parentElement.style.display = 'none';
-  alert(`Hallo ${playerName}! Die Apfel KI ist bereit.`);
+  alert(`Hallo ${playerName}! Die Apfel KI ist bereit. (Programmiert von Fabian D.)`);
 }
 
-// KI Logik
+// Große KI Logik
 class RealisticLogicAI {
   constructor(outputEl){
     this.outputEl = outputEl;
+    this.memory = [];
+
     this.knowledge = [
+      // Smalltalk
       { keywords: ['hallo','hi','hey'], responses: ['Hallo!', 'Hi, wie geht es dir?', 'Hey, schön dich zu sehen!'] },
       { keywords: ['wie geht es dir','wie läufts'], responses: ['Mir geht es gut, danke!', 'Alles bestens hier!', 'Super, danke der Nachfrage.'] },
+      { keywords: ['tschüss','bye','auf wiedersehen'], responses: ['Tschüss! Bis bald!', 'Auf Wiedersehen!', 'Mach’s gut!'] },
+
+      // Zeit
       { keywords: ['zeit','uhr'], responses: [`Die aktuelle Uhrzeit ist ${new Date().toLocaleTimeString()}`, 'Schau mal auf deine Uhr!'] },
-      { keywords: ['rechnen','berechne','math'], responses: ['Kannst du mir bitte die Aufgabe geben?', 'Ich kann einfache Rechnungen lösen.'] }
+
+      // Mathematik
+      { keywords: ['rechnen','berechne','math','summe','minus','mal','geteilt'], responses: [
+        'Gib mir bitte die mathematische Aufgabe, dann löse ich sie.',
+        'Ich kann einfache Rechnungen ausführen. Zum Beispiel: 2+2=4'
+      ]},
+
+      // Programmieren
+      { keywords: ['programmieren','code','javascript','java','python','c++'], responses: [
+        'Ich kann dir erklären, wie man in verschiedenen Sprachen programmiert!',
+        'Beispiel JavaScript: console.log("Hallo Welt");',
+        'Beispiel Python: print("Hallo Welt")',
+        'Beispiel Java: System.out.println("Hallo Welt");'
+      ]},
+
+      // Minecraft
+      { keywords: ['minecraft','plugin','spigot','bukkit'], responses: [
+        'Für Minecraft Plugins empfehle ich Spigot oder Paper. Du kannst Events, Commands und GUI programmieren.',
+        'Beispiel CommandExecutor:\n@Override\npublic boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {\n sender.sendMessage("Befehl ausgeführt!"); return true;\n}'
+      ]},
+
+      // Allgemeinwissen
+      { keywords: ['erkläre','was ist','definiere','wer ist'], responses: [
+        'Hier ist eine kurze Erklärung:',
+        'Ich kann dir darüber Informationen geben.',
+        'Faszinierend! Lass mich erklären:'
+      ]},
+
+      // Wissenschaft
+      { keywords: ['physik','chemie','mathematik','astronomie','biologie'], responses: [
+        'In diesem Bereich kann ich dir fundiertes Wissen liefern.',
+        'Wissenschaftliche Fakten:'
+      ]},
+
+      // Geschichte
+      { keywords: ['geschichte','weltkrieg','römisch','mittelalter'], responses: [
+        'Lass uns über Geschichte sprechen!',
+        'Wichtige historische Fakten:'
+      ]},
+
+      // Raumfahrt
+      { keywords: ['raumfahrt','planet','sonne','mond','mars'], responses: [
+        'Die Raumfahrt ist spannend! Wusstest du, dass der Mars rote Farbe durch Eisenoxid hat?',
+        'Astronomische Fakten:'
+      ]},
+
+      // Humor
+      { keywords: ['witz','scherz','funny'], responses: [
+        'Haha, das ist lustig!',
+        'Ich liebe Humor! 😄',
+        'Guter Witz!'
+      ]},
+
+      // Tiere
+      { keywords: ['hund','katze','tier','vogel'], responses: [
+        'Tiere sind faszinierend. Wusstest du, dass Katzen bis zu 20 Jahre alt werden können?',
+        'Tiere bringen Freude ins Leben!'
+      ]}
     ];
+
     this.defaultResponses = [
       'Interessant, erzähl mir mehr.',
       'Kannst du das genauer erklären?',
       'Hmmm… darüber habe ich noch nicht nachgedacht.',
       'Spannend, erzähl mir mehr!',
-      'Ich verstehe, weiter…'
+      'Ich verstehe, weiter…',
+      'Faszinierend! Erzähle mir mehr, ich lerne ständig dazu.',
+      'Ich bin programmiert von Fabian D., um alles Mögliche zu beantworten.'
     ];
   }
 
-  respond(inputEl) {
+  respond(inputEl){
     const question = inputEl.value.trim();
     if(!question || !currentChat) return;
     this.outputEl.innerText += `\n[KI denkt...]`;
@@ -99,6 +165,7 @@ class RealisticLogicAI {
     let answer = '';
     const lowerQ = question.toLowerCase();
 
+    // Prüfe die Knowledgebase
     for(const item of this.knowledge){
       if(item.keywords.some(k => lowerQ.includes(k))){
         answer = item.responses[Math.floor(Math.random() * item.responses.length)];
@@ -106,11 +173,16 @@ class RealisticLogicAI {
       }
     }
 
+    // Zufallsantwort, wenn keine Keywords passen
     if(!answer){
       answer = this.defaultResponses[Math.floor(Math.random() * this.defaultResponses.length)];
     }
 
+    // Memory speichern
+    this.memory.push({question, answer});
     this.outputEl.innerText += `\n[Antwort]\n${answer}`;
+
+    // Chat speichern
     chats[currentChat].push(`> ${question}`);
     chats[currentChat].push(answer);
 
